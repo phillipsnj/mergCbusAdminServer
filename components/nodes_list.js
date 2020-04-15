@@ -4,7 +4,7 @@ Vue.component('nodes_list', {
     data: function () {
         return {
             headers: [
-                {text: 'id', value: 'id'},
+                {text: 'node', value: 'node'},
                 {text: 'manuf', value: 'manuf'},
                 {text: 'module', value: 'module'},
                 {text: 'consumer', value: 'consumer'},
@@ -46,8 +46,8 @@ Vue.component('nodes_list', {
                         <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
                             <v-container>
                             <v-card>
-                                <v-toolbar dark color="primary">
-                                <v-btn icon dark @click="dialog = false">
+                                <v-toolbar color="primary">
+                                <v-btn icon @click="dialog = false">
                                 <v-icon>close</v-icon>
                                 </v-btn>
                                 <v-toolbar-title>Node : {{ selectedNode.node }}</v-toolbar-title>

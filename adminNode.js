@@ -71,17 +71,17 @@ const admin = require('./mergAdminNode.js')
 const file = './nodeConfig.json'
 
 const NET_PORT = 5550;
-const NET_ADDRESS = "192.168.8.154";
+const NET_ADDRESS = "192.168.8.154"
 
 let node = new admin.cbusAdmin(file,NET_ADDRESS,NET_PORT);
 
 node.on('events', function (events) {
-    //console.log(`Events :${JSON.stringify(events)}`)
+    console.log(`Events :${JSON.stringify(events)}`)
     io.emit('events', events);
 })
 
 node.on('nodes', function (nodes) {
-    //console.log(`Nodes :${JSON.stringify(nodes)}`)
+    console.log(`Nodes Sent :${JSON.stringify(nodes)}`)
     io.emit('nodes', nodes);
 })
 
