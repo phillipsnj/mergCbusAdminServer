@@ -4,6 +4,9 @@ var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
+const NET_PORT = 5550;
+const NET_ADDRESS = "192.168.8.154"
+
 app.use(express.static('.'));
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
@@ -13,7 +16,7 @@ io.on('connection', function(socket){
     console.log('an user connected')
     node.cbusSend(node.QNN())
     socket.on('QNN', function(){
-        console.log('QNN Requested 2');
+        console.log('QNN Requested');
         node.cbusSend(node.QNN())
     })
     socket.on('RQNPN', function(data){ //Request Node Parameter
@@ -70,9 +73,6 @@ const admin = require('./mergAdminNode.js')
 
 const file = './nodeConfig.json'
 
-const NET_PORT = 5550;
-const NET_ADDRESS = "192.168.8.154"
-
 let node = new admin.cbusAdmin(file,NET_ADDRESS,NET_PORT);
 
 node.on('events', function (events) {
@@ -81,7 +81,7 @@ node.on('events', function (events) {
 })
 
 node.on('nodes', function (nodes) {
-    console.log(`Nodes Sent :${JSON.stringify(nodes)}`)
+    //console.log(`Nodes Sent :${JSON.stringify(nodes)}`)
     io.emit('nodes', nodes);
 })
 

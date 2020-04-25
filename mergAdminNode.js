@@ -155,8 +155,8 @@ class cbusAdmin extends EventEmitter {
                 }
                 this.emit('cbusError',this.cbusErrors)
             },
-            'F2': (msg) => {//ENSRP Repsponse to NERD/NENRD
-                console.log(`Action Node ${msg.nodeId()} Action ${msg.actionId()} Action Number ${msg.actionEventId()}`)
+            'F2': (msg) => {//ENSRP Response to NERD/NENRD
+                console.log(`ENSRP Response to NERD : Node : ${msg.nodeId()} Action : ${msg.actionId()} Action Number : ${msg.actionEventId()}`)
                 //console.log((`Number of Event Variables ${this.config.nodes[msg.nodeId()].parameters[5]}`))
                 const ref = msg.actionEventId()
                 if (!(ref in this.config.nodes[msg.nodeId()].actions)) {
@@ -187,7 +187,7 @@ class cbusAdmin extends EventEmitter {
                 //this.cbusSend(this.REVAL(msg.nodeId(),this.config.nodes[msg.nodeId()].parameters[5]))
             },
             'B5': (msg) => {//Read of EV value Response REVAL
-                console.log(`B5 ${msg.nodeId()} Event : ${msg.actionEventIndex()} Event Variable : ${msg.actionEventVarId()} Event Variable Value : ${msg.actionEventVarVal()}`)
+                console.log(`REVAL B5 ${msg.nodeId()} Event : ${msg.actionEventIndex()} Event Variable : ${msg.actionEventVarId()} Event Variable Value : ${msg.actionEventVarVal()}`)
                 this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] = msg.actionEventVarVal()
                 /*if (msg.actionEventVarId()===0){
                     for (let i=1; i<=msg.actionEventVarVal();i++){
@@ -213,7 +213,7 @@ class cbusAdmin extends EventEmitter {
                     }
                     //this.config.nodes[msg.nodeId()].parameters[0] = msg.paramValue()
                 } //else {*/
-                console.log(`Node ${msg.nodeId()} Parameter ${msg.paramId()} Value ${msg.paramValue()}`)
+                console.log(`PARAN 9B ${msg.nodeId()} Parameter ${msg.paramId()} Value ${msg.paramValue()}`)
                 this.config.nodes[msg.nodeId()].parameters[msg.paramId()] = msg.paramValue()
                 //}
                 this.saveConfig()
@@ -231,7 +231,10 @@ class cbusAdmin extends EventEmitter {
 
             },
             '01': (msg) => {
-                console.log("OpCode " + msg.opCode() + ' ' + msg.messageOutput() + ' ' + msg.deCodeCbusMsg());
+                console.log("ACK (01) : " + msg.opCode() + ' ' + msg.messageOutput() + ' ' + msg.deCodeCbusMsg());
+            },
+            '59': (msg) => {
+                console.log("WRACK (59) : " + msg.opCode() + ' ' + msg.messageOutput() + ' ' + msg.deCodeCbusMsg());
             },
             'DEFAULT': (msg) => {
                 console.log("Opcode " + msg.opCode() + ' NodeId ' + msg.nodeId()+' is not supported by the Admin module');

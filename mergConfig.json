@@ -2,15 +2,19 @@
   "modules": {
     "32": {
       "name": "canmio-universal",
-      "component": "mergDefault"
+      "component": "mergCANMIO"
     },
     "29": {
-      "name": "canpan",
+      "name": "CANPAN",
       "component": "mergDefault"
     },
     "10": {
-      "name": "cancmd",
-      "component": "cancmd"
+      "name": "CANCMD",
+      "component": "mergDefault"
+    },
+    "5": {
+      "name": "CANACE8C",
+      "component": "mergDefault"
     }
   },
   "cbusErrors": {
