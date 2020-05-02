@@ -5,7 +5,7 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
 const NET_PORT = 5550;
-const NET_ADDRESS = "192.168.8.154"
+const NET_ADDRESS = "192.168.8.200"
 
 app.use(express.static('.'));
 app.get('/', function(req, res){
@@ -48,6 +48,7 @@ io.on('connection', function(socket){
         node.cbusSend(node.REVAL(data.nodeId, data.actionId, data.eventId))
         node.cbusSend(node.NNULN(data.nodeId))
         node.cbusSend(node.NERD(data.nodeId))
+        node.cbusSend(node.RQEVN(data.nodeId))
     })
     socket.on('EVULN', function(data){
         console.log(`EVULN ${JSON.stringify(data)}`);
@@ -56,6 +57,7 @@ io.on('connection', function(socket){
         node.cbusSend(node.NNULN(data.nodeId))
         node.removeNodeEvents(data.nodeId)
         node.cbusSend(node.NERD(data.nodeId))
+        node.cbusSend(node.RQEVN(data.nodeId))
     })
 });
 

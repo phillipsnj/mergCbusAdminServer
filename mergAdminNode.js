@@ -101,6 +101,7 @@ class cbusAdmin extends EventEmitter {
                 this.cbusSend(this.RQNPN(msg.nodeId(),0))// Get the number of Parameters
                 //this.cbusSend(this.RQNPN(msg.nodeId(),5))// Get the number of Event Variables
                 this.cbusSend(this.RQNPN(msg.nodeId(),6))// Get the number of Node Variables
+                this.cbusSend((this.RQEVN(msg.nodeId())))
                 //this.cbusSend(this.NVRD(msg.nodeId(),1))//
                 /*let nodes = []
                 for (let node in this.config.nodes){
@@ -236,6 +237,11 @@ class cbusAdmin extends EventEmitter {
             '59': (msg) => {
                 console.log("WRACK (59) : " + msg.opCode() + ' ' + msg.messageOutput() + ' ' + msg.deCodeCbusMsg());
             },
+            '74': (msg) => {
+                console.log(`NUMNEV (74) : ${msg.nodeId()}`);
+                this.config.nodes[msg.nodeId()].EvCount = msg.variableId()
+                this.saveConfig()
+            },
             'DEFAULT': (msg) => {
                 console.log("Opcode " + msg.opCode() + ' NodeId ' + msg.nodeId()+' is not supported by the Admin module');
             }
@@ -346,6 +352,10 @@ class cbusAdmin extends EventEmitter {
 
     NVRD(nodeId, variableId) {// Read Node Variable
         return this.header + '71' + decToHex(nodeId, 4) + decToHex(variableId, 2) + ';'
+    }
+
+    RQEVN(nodeId) {// Read Node Variable
+        return this.header + '58' + decToHex(nodeId, 4)+ ';'
     }
 
     NVSET(nodeId, variableId, variableVal) {// Read Node Variable

@@ -6,17 +6,20 @@
     },
     "29": {
       "name": "CANPAN",
-      "component": "mergDefault"
+      "component": "mergCANPAN"
     },
     "10": {
       "name": "CANCMD",
-      "component": "mergDefault"
+      "component": "mergCANCMD"
     },
     "5": {
       "name": "CANACE8C",
       "component": "mergDefault"
     }
   },
+
+
+
   "cbusErrors": {
     "1" : "Command Not Supported",
     "2" : "Not in Learn Mode",
