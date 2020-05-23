@@ -1,0 +1,37 @@
+{
+  "layoutDetails": {
+    "title": "MERG Test Track",
+    "subTitle": "Settings",
+    "subtitle": "Admin"
+  },
+  "eventDetails": {
+    "022D0001": {
+      "name": "Button One 557",
+      "colour": "red"
+    },
+    "022D0002": {
+      "name": "Button 2",
+      "colour": "red"
+    },
+    "022D0008": {
+      "name": "Button 8 on 557",
+      "colour": "red"
+    },
+    "022D0007": {
+      "name": "Button 7",
+      "colour": "green"
+    },
+    "022D0006": {
+      "name": "022D0006",
+      "colour": "orange"
+    },
+    "0259000E": {
+      "name": "0259000E",
+      "colour": "orange"
+    },
+    "0102001D": {
+      "name": "Main Test Button",
+      "colour": "teal"
+    }
+  }
+}

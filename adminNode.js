@@ -3,9 +3,12 @@ var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+const jsonfile = require('jsonfile')
 
 const NET_PORT = 5550;
 const NET_ADDRESS = "192.168.8.200"
+
+let layoutDetails = jsonfile.readFileSync('./layoutDetails.json')
 
 app.use(express.static('.'));
 app.get('/', function(req, res){
@@ -15,6 +18,7 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
     console.log('an user connected')
     node.cbusSend(node.QNN())
+    io.emit('layoutDetails', layoutDetails)
     socket.on('QNN', function(){
         console.log('QNN Requested');
         node.cbusSend(node.QNN())
@@ -58,6 +62,16 @@ io.on('connection', function(socket){
         node.removeNodeEvents(data.nodeId)
         node.cbusSend(node.NERD(data.nodeId))
         node.cbusSend(node.RQEVN(data.nodeId))
+    })
+    socket.on('UPDATE_LAYOUT_DETAILS', function(data){
+        console.log(`UPDATE_LAYOUT_DETAILS ${JSON.stringify(data)}`)
+        layoutDetails = data
+        jsonfile.writeFileSync('./layoutDetails.json', layoutDetails, {spaces: 2, EOL: '\r\n'})
+        io.emit('layoutDetails', layoutDetails)
+    })
+    socket.on('CLEAR_CBUS_ERRORS', function(data){
+        console.log(`CLEAR_CBUS_ERRORS`)
+        node.clearCbusErrors()
     })
 });
 

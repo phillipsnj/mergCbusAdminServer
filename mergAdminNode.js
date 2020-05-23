@@ -5,6 +5,7 @@ const jsonfile = require('jsonfile')
 const cbusMessage = require('./mergCbusMessage.js')
 //const merg = jsonfile.readFileSync('./nodeConfig.json')
 
+
 const EventEmitter = require('events').EventEmitter;
 
 function pad(num, len) { //add zero's to ensure hex values have correct number of characters
@@ -55,7 +56,7 @@ class cbusAdmin extends EventEmitter {
                 //console.log(`merg :${JSON.stringify(this.merg)}`)
                 const ref = msg.nodeId()
 
-                //console.log(`Node found ${msg.messageOutput()} NodeId ${msg.nodeId()} ManufId ${msg.manufId()} ModuleId ${msg.moduleId()} flags ${msg.flags()}`)
+                console.log(`PNN (B6) Node found ${msg.messageOutput()} NodeId ${msg.nodeId()} ManufId ${msg.manufId()} ModuleId ${msg.moduleId()} flags ${msg.flags()}`)
                 if (ref in this.config.nodes) {
                     this.config.nodes[ref].flim = (msg.flags() & 4) ? true : false
                     if (this.merg['modules'][msg.moduleId()]) {
@@ -77,7 +78,8 @@ class cbusAdmin extends EventEmitter {
                         "coe": false,
                         "parameters": [],
                         "variables": [],
-                        "actions": {}
+                        "actions": {},
+                        "status" : true
 
                     }
                     if (this.merg['modules'][msg.moduleId()]) {
@@ -97,6 +99,7 @@ class cbusAdmin extends EventEmitter {
                     this.config.nodes[ref].bootloader = (msg.flags() & 8) ? true : false
                     this.config.nodes[ref].coe = (msg.flags() & 16) ? true : false
                 }
+                this.config.nodes[ref].status = true
                 //this.saveConfig()
                 this.cbusSend(this.RQNPN(msg.nodeId(),0))// Get the number of Parameters
                 //this.cbusSend(this.RQNPN(msg.nodeId(),5))// Get the number of Event Variables
@@ -127,7 +130,7 @@ class cbusAdmin extends EventEmitter {
             },
             'EF': (msg) => {//Request Node Parameter in setup
                 // mode
-                console.log(`PARAMS Received`)
+                console.log(`PARAMS (EF) Received`)
             },
             '63': (msg) => {//CMDERR
                 console.log(`CMD ERROR Node ${msg.nodeId()} Error ${msg.errorId()}`)
@@ -167,69 +170,49 @@ class cbusAdmin extends EventEmitter {
                         "actionId": msg.actionEventId()
                     }
                     this.cbusSend(this.REVAL(msg.nodeId(),msg.actionEventId(),0))
+                    this.saveConfig()
                 }
-                this.saveConfig()
-                /*if (this.config.nodes[msg.nodeId()].module === 32) {
-                    console.log(`Canmio ${msg.nodeId()} ${this.config.nodes[msg.nodeId()].module} ${msg.actionEventId()}`)
-                    //this.cbusSend(this.REVAL(msg.nodeId(), msg.actionEventId(), 0))
-                    for (let i = 0; i <= this.config.nodes[msg.nodeId()].parameters[5]; i++) {
-                        setTimeout(function () {
-                            this.cbusSend(this.REVAL(msg.nodeId(), msg.actionEventId(), i))
-                        }.bind(this), 250 * i)
-                    }
-                } else {
-                    console.log(`Not Canmio ${msg.nodeId()} ${this.config.nodes[msg.nodeId()].module} ${msg.actionEventId()}`)
-                    for (let i = 1; i <= this.config.nodes[msg.nodeId()].parameters[5]; i++) {
-                        setTimeout(function () {
-                            this.cbusSend(this.REVAL(msg.nodeId(), msg.actionEventId(), i))
-                        }.bind(this), 250 * i)
-                    }
-                }*/
-                //this.cbusSend(this.REVAL(msg.nodeId(),this.config.nodes[msg.nodeId()].parameters[5]))
+                //this.saveConfig()
             },
             'B5': (msg) => {//Read of EV value Response REVAL
-                console.log(`REVAL B5 ${msg.nodeId()} Event : ${msg.actionEventIndex()} Event Variable : ${msg.actionEventVarId()} Event Variable Value : ${msg.actionEventVarVal()}`)
-                this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] = msg.actionEventVarVal()
-                /*if (msg.actionEventVarId()===0){
-                    for (let i=1; i<=msg.actionEventVarVal();i++){
-                        this.cbusSend(this.REVAL(msg.nodeId(), msg.actionEventId(), i))
+                console.log(`REVAL (B5) ${msg.nodeId()} Event : ${msg.actionEventIndex()} Event Variable : ${msg.actionEventVarId()} Event Variable Value : ${msg.actionEventVarVal()}`)
+                if (this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] != null) {
+                    //console.log(`Event Variable Exists `)
+                    if (this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] != msg.actionEventVarVal()){
+                        console.log(`Event Variable Value has Changed `)
+                        this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] = msg.actionEventVarVal()
+                        this.saveConfig()
                     }
-                }*/
-                this.saveConfig()
+                } else {
+                    console.log(`Event Variable Does not exist on config`)
+                    this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] = msg.actionEventVarVal()
+                    this.saveConfig()
+                }
+                //this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] = msg.actionEventVarVal()
+                //this.saveConfig()
             },
             '97': (msg) => { //Receive Node Variable Value
-                console.log(`Variable Received Node ${msg.nodeId()} : ${msg.variableId()} : ${msg.variableVal()}`)
+                console.log(`NVANS (97) Node ${msg.nodeId()} : ${msg.variableId()} : ${msg.variableVal()}`)
                 this.config.nodes[msg.nodeId()].variables[msg.variableId()] = msg.variableVal()
                 this.saveConfig()
             },
             '9B': (msg) => {//PARAN Parameter readback by Index
-                //console.log(`9B Node ${msg.nodeId()} Parameter ${msg.paramId()} Value ${msg.paramValue()}`)
-                /*if (msg.paramId() === 0) {
-                    console.log(`Number of Parameters ${msg.paramValue()}`)
-                    for (let i = 1; i <= msg.paramValue(); i++) {
-                        console.log(`Request Node Parameter ${msg.nodeId()} , ${i} : ${this.RQNPN(msg.nodeId(), pad(i.toString(16).toUpperCase(), 2))}`)
-                        setTimeout(function () {
-                            this.cbusSend(this.RQNPN(msg.nodeId(), pad(i.toString(16).toUpperCase(), 2)))
-                        }.bind(this), 50 * i)
+                console.log(`PARAN (9B) ${msg.nodeId()} Parameter ${msg.paramId()} Value ${msg.paramValue()}`)
+                if (this.config.nodes[msg.nodeId()].parameters[msg.paramId()] != null) {
+                    if (this.config.nodes[msg.nodeId()].parameters[msg.paramId()] != msg.paramValue()){
+                        console.log(`Parameter value has changed`)
+                        this.config.nodes[msg.nodeId()].parameters[msg.paramId()] = msg.paramValue()
+                        this.saveConfig()
+                    } else {
+                        console.log(`Parameter value has not changed`)
                     }
-                    //this.config.nodes[msg.nodeId()].parameters[0] = msg.paramValue()
-                } //else {*/
-                console.log(`PARAN 9B ${msg.nodeId()} Parameter ${msg.paramId()} Value ${msg.paramValue()}`)
-                this.config.nodes[msg.nodeId()].parameters[msg.paramId()] = msg.paramValue()
-                //}
-                this.saveConfig()
-                /*if (msg.paramId() === 5) {
-                    this.cbusSend(this.NERD(msg.nodeId()))
-                }*/
-                /*if (msg.paramId() === 6) {
-                    //console.log(`Number of Variables ${msg.paramValue()}`)
-                    for (let i = 1; i <= msg.paramValue(); i++) {
-                        setTimeout(function () {
-                            this.cbusSend(this.NVRD(msg.nodeId(), i))
-                        }.bind(this), 250 * i)
-                    }
-                }*/
-
+                } else {
+                    console.log(`Parameter value does not exist in config`)
+                    this.config.nodes[msg.nodeId()].parameters[msg.paramId()] = msg.paramValue()
+                    this.saveConfig()
+                }
+                //this.config.nodes[msg.nodeId()].parameters[msg.paramId()] = msg.paramValue()
+                //this.saveConfig()
             },
             '01': (msg) => {
                 console.log("ACK (01) : " + msg.opCode() + ' ' + msg.messageOutput() + ' ' + msg.deCodeCbusMsg());
@@ -238,7 +221,7 @@ class cbusAdmin extends EventEmitter {
                 console.log("WRACK (59) : " + msg.opCode() + ' ' + msg.messageOutput() + ' ' + msg.deCodeCbusMsg());
             },
             '74': (msg) => {
-                console.log(`NUMNEV (74) : ${msg.nodeId()}`);
+                console.log(`NUMNEV (74) : ${msg.nodeId()} :: ${msg.paramId()}`);
                 this.config.nodes[msg.nodeId()].EvCount = msg.variableId()
                 this.saveConfig()
             },
@@ -259,6 +242,11 @@ class cbusAdmin extends EventEmitter {
     removeNodeEvents(nodeId) {
         this.config.nodes[nodeId].actions = {}
         this.saveConfig()
+    }
+
+    clearCbusErrors() {
+        this.cbusErrors = {}
+        this.emit('cbusError',this.cbusErrors)
     }
 
     cbusSend(msg) {
@@ -298,7 +286,7 @@ class cbusAdmin extends EventEmitter {
     }
 
     saveConfig() {
-        //console.log(`Save Config :${JSON.stringify(this.config)}`)
+        console.log(`Save Config `)
         //this.config.events = this.events
         //jsonfile.writeFileSync(this.configFile, this.config, {spaces: 2, EOL: '\r\n'})
         //let nodes = []
@@ -310,6 +298,9 @@ class cbusAdmin extends EventEmitter {
     }
 
     QNN() {//Query Node Number
+        for (let node in this.config.nodes){
+            this.config.nodes[node].status = false
+        }
         return this.header + '0D' + ';'
     }
 
@@ -361,6 +352,20 @@ class cbusAdmin extends EventEmitter {
     NVSET(nodeId, variableId, variableVal) {// Read Node Variable
         console.log(`NVSET NodeId : ${nodeId} VariableId : ${variableId} Variable Value : ${variableVal} :: ${decToHex(variableVal,2)}`)
         return this.header + '96' + decToHex(nodeId, 4) + decToHex(variableId, 2) + decToHex(variableVal,2) + ';'
+    }
+    ACON(NodeId, eventId) {
+        return this.header + '90' + decToHex(nodeId, 4) + decToHex(eventId, 4) + ';';
+    }
+
+    ACOF(NodeId, eventId) {
+        return this.header + '90' + decToHex(nodeId, 4) + decToHex(eventId, 4) + ';';
+    }
+    ASON(eventId) {
+        return this.header + '980000' + decToHex(eventId, 4) + ';';
+    }
+
+    ASOF(eventId) {
+        return this.header + '990000' + decToHex(eventId, 4) + ';';
     }
 
     /*ENRSP() {
@@ -445,20 +450,7 @@ class cbusAdmin extends EventEmitter {
         return this.header + 'E2' + output + ';'
     }
 
-    ACON(event) {
-        return this.header + '90' + pad(this.nodeId.toString(16), 4) + pad(event.toString(16), 4) + ';';
-    }
-
-    ACOF(event) {
-        return this.header + '91' + pad(this.nodeId.toString(16), 4) + pad(event.toString(16), 4) + ';';
-    }
-    ASON(event) {
-        return this.header + '980000' + pad(event.toString(16), 4) + ';';
-    }
-
-    ASOF(event) {
-        return this.header + '990000' + pad(event.toString(16), 4) + ';';
-    }*/
+    */
 };
 
 
