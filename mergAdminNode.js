@@ -160,7 +160,7 @@ class cbusAdmin extends EventEmitter {
                 this.emit('cbusError',this.cbusErrors)
             },
             'F2': (msg) => {//ENSRP Response to NERD/NENRD
-                console.log(`ENSRP Response to NERD : Node : ${msg.nodeId()} Action : ${msg.actionId()} Action Number : ${msg.actionEventId()}`)
+                console.log(`ENSRP (F2) Response to NERD : Node : ${msg.nodeId()} Action : ${msg.actionId()} Action Number : ${msg.actionEventId()}`)
                 //console.log((`Number of Event Variables ${this.config.nodes[msg.nodeId()].parameters[5]}`))
                 const ref = msg.actionEventId()
                 if (!(ref in this.config.nodes[msg.nodeId()].actions)) {
@@ -182,6 +182,8 @@ class cbusAdmin extends EventEmitter {
                         console.log(`Event Variable Value has Changed `)
                         this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] = msg.actionEventVarVal()
                         this.saveConfig()
+                    } else {
+                        console.log(`Event Variable Value has not Changed `)
                     }
                 } else {
                     console.log(`Event Variable Does not exist on config`)
@@ -193,8 +195,21 @@ class cbusAdmin extends EventEmitter {
             },
             '97': (msg) => { //Receive Node Variable Value
                 console.log(`NVANS (97) Node ${msg.nodeId()} : ${msg.variableId()} : ${msg.variableVal()}`)
-                this.config.nodes[msg.nodeId()].variables[msg.variableId()] = msg.variableVal()
-                this.saveConfig()
+                if (this.config.nodes[msg.nodeId()].variables[msg.variableId()] != null) {
+                    if (this.config.nodes[msg.nodeId()].variables[msg.variableId()] != msg.variableVal()) {
+                        console.log(`Variable value has changed`)
+                        this.config.nodes[msg.nodeId()].variables[msg.variableId()] = msg.variableVal()
+                        this.saveConfig()
+                    } else {
+                        console.log(`Variable value has not changed`)
+                    }
+                } else {
+                    console.log(`Variable value does not exist in config`)
+                    this.config.nodes[msg.nodeId()].variables[msg.variableId()] = msg.variableVal()
+                    this.saveConfig()
+                }
+                //this.config.nodes[msg.nodeId()].variables[msg.variableId()] = msg.variableVal()
+                //this.saveConfig()
             },
             '9B': (msg) => {//PARAN Parameter readback by Index
                 console.log(`PARAN (9B) ${msg.nodeId()} Parameter ${msg.paramId()} Value ${msg.paramValue()}`)
@@ -333,7 +348,7 @@ class cbusAdmin extends EventEmitter {
         return this.header + '9C' + decToHex(nodeId, 4) + decToHex(eventId, 2) + decToHex(valueId, 2) + ';'
     }
     EVLRN(event, eventId, valueId) {//Read an Events EV by index
-        console.log(`EVLRN Event : ${event} EventId : ${eventId} Event Value : ${valueId}`)
+        //console.log(`EVLRN Event : ${event} EventId : ${eventId} Event Value : ${valueId}`)
         return this.header + 'D2' + event + decToHex(eventId, 2) + decToHex(valueId, 2) + ';'
     }
     EVULN(event) {//Read an Events EV by index

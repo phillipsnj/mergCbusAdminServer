@@ -32,6 +32,10 @@
     "0102001D": {
       "name": "Main Test Button",
       "colour": "teal"
+    },
+    "022D0003": {
+      "name": "Button 3",
+      "colour": "purple"
     }
   }
 }

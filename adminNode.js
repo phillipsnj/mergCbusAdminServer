@@ -6,7 +6,7 @@ var io = require('socket.io')(http);
 const jsonfile = require('jsonfile')
 
 const NET_PORT = 5550;
-const NET_ADDRESS = "192.168.8.200"
+const NET_ADDRESS = "192.168.8.154"
 
 let layoutDetails = jsonfile.readFileSync('./layoutDetails.json')
 
@@ -54,6 +54,15 @@ io.on('connection', function(socket){
         node.cbusSend(node.NERD(data.nodeId))
         node.cbusSend(node.RQEVN(data.nodeId))
     })
+    socket.on('TEACH_EVENT', function(data){
+        console.log(`EVLRN ${JSON.stringify(data)}`);
+        node.cbusSend(node.NNLRN(data.nodeId))
+        node.cbusSend(node.EVLRN(data.eventName, data.eventId, data.eventVal))
+        node.cbusSend(node.NNULN(data.nodeId))
+        node.cbusSend(node.NNULN(data.nodeId))
+        node.cbusSend(node.NERD(data.nodeId))
+        node.cbusSend(node.RQEVN(data.nodeId))
+    })
     socket.on('EVULN', function(data){
         console.log(`EVULN ${JSON.stringify(data)}`);
         node.cbusSend(node.NNLRN(data.nodeId))
@@ -92,7 +101,7 @@ const file = './nodeConfig.json'
 let node = new admin.cbusAdmin(file,NET_ADDRESS,NET_PORT);
 
 node.on('events', function (events) {
-    console.log(`Events :${JSON.stringify(events)}`)
+    //console.log(`Events :${JSON.stringify(events)}`)
     io.emit('events', events);
 })
 
