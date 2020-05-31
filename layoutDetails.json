@@ -1,20 +1,37 @@
 {
   "layoutDetails": {
-    "title": "MERG Test Track",
+    "title": "Test Layout",
     "subTitle": "Settings",
     "subtitle": "Admin"
   },
+  "nodeDetails": {
+    "403": {
+      "name": "CANDISP - 403",
+      "colour": "indigo"
+    },
+    "557": {
+      "name": "CANACE8C - 557",
+      "colour": "purple"
+    },
+    "700": {
+      "name": "CANSERVO8C 4G - 700",
+      "colour": "red"
+    },
+    "undefined": {
+      "colour": "black"
+    }
+  },
   "eventDetails": {
     "022D0001": {
-      "name": "Button One 557",
-      "colour": "red"
+      "name": "Btn One 557",
+      "colour": "amber"
     },
     "022D0002": {
       "name": "Button 2",
       "colour": "red"
     },
     "022D0008": {
-      "name": "Button 8 on 557",
+      "name": "Btn 8 on 557",
       "colour": "red"
     },
     "022D0007": {
@@ -36,6 +53,10 @@
     "022D0003": {
       "name": "Button 3",
       "colour": "purple"
+    },
+    "01020001": {
+      "name": "Node 258 Btn 1",
+      "colour": "blue-grey"
     }
   }
 }

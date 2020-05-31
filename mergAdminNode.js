@@ -27,7 +27,7 @@ class cbusAdmin extends EventEmitter {
         super();
         this.merg=merg
         console.log(`merg :${JSON.stringify(this.merg)}`)
-        console.log(`merg- 32 :${JSON.stringify(this.merg['modules'][32]['name'])}`)
+        //console.log(`merg- 32 :${JSON.stringify(this.merg['modules'][32]['name'])}`)
         this.config = setup
         this.configFile = CONFIG_FILE
         this.pr1 = 2
@@ -51,6 +51,12 @@ class cbusAdmin extends EventEmitter {
                 this.action_message(msg)
             }
         }.bind(this))
+        this.client.on('error', (err) => {
+            console.log(`TCP ERROR ${err.code}`)
+        })
+        this.client.on('close', function() {
+            console.log('Connection Closed')
+        })
         this.actions = { //actions when Opcodes are received
             'B6': (msg) => { //PNN Recieved from Node
                 //console.log(`merg :${JSON.stringify(this.merg)}`)
@@ -303,7 +309,10 @@ class cbusAdmin extends EventEmitter {
     saveConfig() {
         console.log(`Save Config `)
         //this.config.events = this.events
-        //jsonfile.writeFileSync(this.configFile, this.config, {spaces: 2, EOL: '\r\n'})
+        //
+        //
+        //
+        // jsonfile.writeFileSync(this.configFile, this.config, {spaces: 2, EOL: '\r\n'})
         //let nodes = []
         /*for (let node in this.config.nodes){
             nodes.push(this.config.nodes[node])
@@ -368,12 +377,21 @@ class cbusAdmin extends EventEmitter {
         console.log(`NVSET NodeId : ${nodeId} VariableId : ${variableId} Variable Value : ${variableVal} :: ${decToHex(variableVal,2)}`)
         return this.header + '96' + decToHex(nodeId, 4) + decToHex(variableId, 2) + decToHex(variableVal,2) + ';'
     }
-    ACON(NodeId, eventId) {
+    ACON(nodeId, eventId) {
+        const eId = decToHex(nodeId, 4) + decToHex(eventId, 4)
+        this.config.events[eId]['status'] = 'on'
+        this.config.events[eId]['count'] += 1
+        this.emit('events', Object.values(this.config.events))
+        //console.log(`ACON admin ${eId}`)
         return this.header + '90' + decToHex(nodeId, 4) + decToHex(eventId, 4) + ';';
     }
 
-    ACOF(NodeId, eventId) {
-        return this.header + '90' + decToHex(nodeId, 4) + decToHex(eventId, 4) + ';';
+    ACOF(nodeId, eventId) {
+        const eId = decToHex(nodeId, 4) + decToHex(eventId, 4)
+        this.config.events[eId]['status'] = 'off'
+        this.config.events[eId]['count'] += 1
+        this.emit('events', Object.values(this.config.events))
+        return this.header + '91' + decToHex(nodeId, 4) + decToHex(eventId, 4) + ';';
     }
     ASON(eventId) {
         return this.header + '980000' + decToHex(eventId, 4) + ';';

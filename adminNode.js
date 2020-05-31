@@ -6,14 +6,14 @@ var io = require('socket.io')(http);
 const jsonfile = require('jsonfile')
 
 const NET_PORT = 5550;
-const NET_ADDRESS = "192.168.8.154"
+const NET_ADDRESS = "192.168.8.123"
 
 let layoutDetails = jsonfile.readFileSync('./layoutDetails.json')
 
-app.use(express.static('.'));
+/*app.use(express.static('.'));
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
-});
+});*/
 
 io.on('connection', function(socket){
     console.log('an user connected')
@@ -53,6 +53,14 @@ io.on('connection', function(socket){
         node.cbusSend(node.NNULN(data.nodeId))
         node.cbusSend(node.NERD(data.nodeId))
         node.cbusSend(node.RQEVN(data.nodeId))
+    })
+    socket.on('ACON', function(data){
+        console.log(`ACON ${JSON.stringify(data)}`);
+        node.cbusSend(node.ACON(data.nodeId, data.eventId))
+    })
+    socket.on('ACOF', function(data){
+        console.log(`ACOF ${JSON.stringify(data)}`);
+        node.cbusSend(node.ACOF(data.nodeId, data.eventId))
     })
     socket.on('TEACH_EVENT', function(data){
         console.log(`EVLRN ${JSON.stringify(data)}`);
@@ -94,7 +102,6 @@ http.listen(3000, function(){
 });
 
 const admin = require('./mergAdminNode.js')
-
 
 const file = './nodeConfig.json'
 
