@@ -10,10 +10,10 @@ const NET_ADDRESS = "192.168.8.123"
 
 let layoutDetails = jsonfile.readFileSync('./layoutDetails.json')
 
-/*app.use(express.static('.'));
+app.use(express.static('.'));
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
-});*/
+});
 
 io.on('connection', function(socket){
     console.log('an user connected')
