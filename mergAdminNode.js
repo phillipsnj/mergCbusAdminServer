@@ -56,7 +56,12 @@ class cbusAdmin extends EventEmitter {
         })
         this.client.on('close', function() {
             console.log('Connection Closed')
-        })
+            setTimeout(() => {
+                this.client.connect(NET_PORT, NET_ADDRESS, function () {
+                    console.log('Client ReConnected');
+                })
+            }, 1000)
+        }.bind(this))
         this.actions = { //actions when Opcodes are received
             'B6': (msg) => { //PNN Recieved from Node
                 //console.log(`merg :${JSON.stringify(this.merg)}`)
@@ -274,6 +279,10 @@ class cbusAdmin extends EventEmitter {
         //console.log(`cbusSend Base : ${msg.toUpperCase()}`)
         this.emit('cbus', msg.toUpperCase());
         this.client.write(msg.toUpperCase());
+    }
+
+    refreshEvents() {
+        this.emit('events', Object.values(this.config.events))
     }
 
     eventSend(msg, status, type) {

@@ -80,6 +80,10 @@ io.on('connection', function(socket){
         node.cbusSend(node.NERD(data.nodeId))
         node.cbusSend(node.RQEVN(data.nodeId))
     })
+    socket.on('REFRESH_EVENTS', function(){
+        console.log(`REFRESH_EVENTS`)
+        node.refreshEvents();
+    })
     socket.on('UPDATE_LAYOUT_DETAILS', function(data){
         console.log(`UPDATE_LAYOUT_DETAILS ${JSON.stringify(data)}`)
         layoutDetails = data
