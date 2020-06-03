@@ -15,6 +15,10 @@
     "5": {
       "name": "CANACE8C",
       "component": "mergDefault"
+    },
+    "65": {
+      "name": "ETHNIGE",
+      "component": "mergDefault"
     }
   },
   "cbusErrors": {

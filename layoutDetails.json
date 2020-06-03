@@ -5,9 +5,20 @@
     "subtitle": "Admin"
   },
   "nodeDetails": {
+    "200": {
+      "name": "Test EthNode",
+      "colour": "red",
+      "group": "Board 1"
+    },
+    "259": {
+      "name": "Test 259",
+      "colour": "black",
+      "group": "Board 1"
+    },
     "403": {
       "name": "CANDISP - 403",
-      "colour": "indigo"
+      "colour": "indigo",
+      "group": "Board 2"
     },
     "557": {
       "name": "CANACE8C - 557",
@@ -15,7 +26,8 @@
     },
     "700": {
       "name": "CANSERVO8C 4G - 700",
-      "colour": "red"
+      "colour": "red",
+      "group": "Board 1"
     },
     "undefined": {
       "colour": "black"
@@ -25,7 +37,7 @@
     "022D0001": {
       "name": "Node 557 : Button 1",
       "colour": "black",
-      "group": "Button"
+      "group": "Lever"
     },
     "022D0002": {
       "name": "Button 2",
@@ -90,6 +102,11 @@
     "01020019": {
       "name": "NodeId : 258 Event : 25",
       "colour": "purple",
+      "group": ""
+    },
+    "00000001": {
+      "name": "Short Event 1",
+      "colour": "green",
       "group": ""
     }
   }
