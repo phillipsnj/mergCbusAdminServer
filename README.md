@@ -17,7 +17,6 @@ node adminNode.js
 
 ### Test the server is running
 ```
-The server has a webpage which can monitor the status of your 
-cbus network and can be found on port 3000.
+The server has a webpage which can monitor the status of your cbus network and can be found on port 3000.
 ```
 

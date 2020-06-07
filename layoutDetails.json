@@ -7,7 +7,7 @@
   "nodeDetails": {
     "200": {
       "name": "Test EthNode",
-      "colour": "red",
+      "colour": "pink",
       "group": "Board 1"
     },
     "259": {
@@ -18,7 +18,7 @@
     "403": {
       "name": "CANDISP - 403",
       "colour": "indigo",
-      "group": "Board 2"
+      "group": "Board 3"
     },
     "557": {
       "name": "CANACE8C - 557",
