@@ -10,7 +10,7 @@ Vue.component('nodes_list', {
                 {text: 'consumer', value: 'consumer'},
                 {text: 'producer', value: 'producer'},
                 {text: 'flim', value: 'flim'},
-                {text: 'bootloader', value: 'bootloader'},
+                {text: 'status', value: 'status'},
                 {text: 'coe', value: 'coe'}
             ],
             dialog: false,

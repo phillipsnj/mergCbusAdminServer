@@ -44,7 +44,7 @@ var app = new Vue({
     data: {
         title: "MERG CbusServer - Admin",
         display_item:"nodes_list",
-        drawer:null,
+        drawer:true,
         events: [],
         nodes: [],
         dccErrors: [],
