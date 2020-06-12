@@ -43,10 +43,7 @@
         </v-app-bar>
     </v-container>
     <v-content>
-        <!--<nodes_list :nodes="nodes" v-if="display_item == 'nodes_list'"></nodes_list>
-        <events :events="events" v-if="display_item == 'events_list'"></events>-->
         <component v-bind:is="display_item"></component>
-        <!--<events_list :events="events"></events_list>-->
     </v-content>
 </v-app>
 

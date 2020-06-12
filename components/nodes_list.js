@@ -36,48 +36,21 @@ Vue.component('nodes_list', {
     template: `<div>
                     <v-container>
                     <v-toolbar light>
-                        <v-toolbar-title>{{ this.$root.title }}</v-toolbar-title>
+                        <v-toolbar-title>{{ $root.title }}</v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-toolbar-items >
                             <v-btn color="success" v-on:click="QNN">QNN()</v-btn>
                         </v-toolbar-items>
                     </v-toolbar>
                     
-                        <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-                            <v-container>
-                            <v-card>
-                                <v-toolbar color="primary">
-                                <v-btn icon @click="dialog = false">
-                                <v-icon>close</v-icon>
-                                </v-btn>
-                                <v-toolbar-title>Node : {{ selectedNode.node }}</v-toolbar-title>
-                                <v-spacer></v-spacer>
-                                <v-toolbar-items>
-                                <v-btn dark flat @click="dialog = false">Save</v-btn>
-                                </v-toolbar-items>
-                                </v-toolbar>
-                                <component v-bind:is="nodeComponent" v-bind:node="selectedNode"></component>
-                            </v-card>
-                            </v-container>
-                        </v-dialog>
-                    
-                    <v-data-table :headers="headers" :items="Object.values(this.$root.nodes)" item-key="node" class="elevation-1" >
-                        <template v-slot:items="props">
-                            <tr @click="editNode(props.item)">
-                                <td>{{ props.item.node }}</td>
-                                <td>{{ props.item.manuf }}</td>
-                                <td>{{ props.item.module }}</td>
-                                <td>{{ props.item.consumer }}</td>
-                                <td>{{ props.item.producer }}</td>
-                                <td>{{ props.item.flim }}</td>
-                                <td>{{ props.item.bootloader }}</td>
-                                <td>{{ props.item.coe }}</td>
-                            </tr>
-                        </template>
+                    <v-data-table :headers="headers" 
+                                  :items="Object.values($root.nodes)" 
+                                  item-key="node" 
+                                  class="elevation-1" >
                     </v-data-table>
                     <div>
                         <h3>Raw Node Data</h3>
-                        <div v-for="node in this.$root.nodes" :key="node.node">
+                        <div v-for="node in $root.nodes" :key="node.node">
                             <p>{{ JSON.stringify(node) }}</p>
                         </div>
                     </div>
