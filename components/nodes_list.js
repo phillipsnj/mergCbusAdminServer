@@ -11,7 +11,8 @@ Vue.component('nodes_list', {
                 {text: 'producer', value: 'producer'},
                 {text: 'flim', value: 'flim'},
                 {text: 'status', value: 'status'},
-                {text: 'coe', value: 'coe'}
+                {text: 'coe', value: 'coe'},
+                {text: 'Actions', value: 'actions', sortable: false }
             ],
             dialog: false,
             nodeComponent: 'mergDefault',
@@ -20,7 +21,8 @@ Vue.component('nodes_list', {
     },
     methods: {
         QNN: function () {
-            socket.emit('QNN')
+            //socket.emit('QNN')
+            this.$root.send('QNN')
         },
         getParameters: function (node_id) {
             console.log(`getParameters ${node_id}`)
@@ -29,14 +31,15 @@ Vue.component('nodes_list', {
             }
         },
         editNode(node) {
-            this.selectedNode = node
-            this.dialog = true
+            console.log(`Edit Node ${node.node}`)
+            this.$store.state.selected_node_id = node.node
+            this.$store.state.display_component = 'mergDefault'
         }
     },
     template: `<div>
                     <v-container>
                     <v-toolbar light>
-                        <v-toolbar-title>{{ $root.title }}</v-toolbar-title>
+                        <v-toolbar-title>{{ $store.state.title }}</v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-toolbar-items >
                             <v-btn color="success" v-on:click="QNN">QNN()</v-btn>
@@ -44,13 +47,16 @@ Vue.component('nodes_list', {
                     </v-toolbar>
                     
                     <v-data-table :headers="headers" 
-                                  :items="Object.values($root.nodes)" 
+                                  :items="Object.values($store.state.nodes)" 
                                   item-key="node" 
                                   class="elevation-1" >
+                        <template v-slot:item.actions="{ item }">
+                            <v-btn color="blue darken-1" text @click="editNode(item)" outlined>Edit</v-btn>
+                        </template>
                     </v-data-table>
                     <div>
                         <h3>Raw Node Data</h3>
-                        <div v-for="node in $root.nodes" :key="node.node">
+                        <div v-for="node in $store.state.nodes" :key="node.node">
                             <p>{{ JSON.stringify(node) }}</p>
                         </div>
                     </div>
