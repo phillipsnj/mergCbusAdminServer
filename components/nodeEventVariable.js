@@ -1,5 +1,5 @@
-Vue.component('nodeEventVariable', {
-    name: "nodeEventVariable",
+Vue.component('node-event-variable', {
+    name: "node-event-variable",
     props: ["nodeId", "actionId", "varId", "name"],
     data: () => ({
         rules: [
