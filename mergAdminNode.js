@@ -181,6 +181,7 @@ class cbusAdmin extends EventEmitter {
                         "actionId": msg.actionEventId()
                     }
                     this.cbusSend(this.REVAL(msg.nodeId(),msg.actionEventId(),0))
+                    this.cbusSend(this.REVAL(msg.nodeId(),msg.actionEventId(),1))
                     this.saveConfig()
                 }
                 //this.saveConfig()

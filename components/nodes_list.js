@@ -1,5 +1,5 @@
-Vue.component('nodes_list', {
-    name: "nodes_list",
+Vue.component('nodes-list', {
+    name: "nodes-list",
     //props: ['nodes'],
     data: function () {
         return {
@@ -31,19 +31,21 @@ Vue.component('nodes_list', {
             }
         },
         editNode(node) {
-            console.log(`Edit Node ${node.node}`)
+            console.log(`Edit Node ${node.module} : ${node.node}`)
             this.$store.state.selected_node_id = node.node
-            this.$store.state.display_component = 'mergDefault'
+            if (node.module == "canmio-universal") {
+                this.$store.state.display_component = 'merg-canmio'
+            } else {
+                this.$store.state.display_component = 'mergDefault'
+            }
         }
     },
     template: `<div>
                     <v-container>
-                    <v-toolbar light>
+                    <v-toolbar flat>
                         <v-toolbar-title>{{ $store.state.title }}</v-toolbar-title>
                         <v-spacer></v-spacer>
-                        <v-toolbar-items >
-                            <v-btn color="success" v-on:click="QNN">QNN()</v-btn>
-                        </v-toolbar-items>
+                        <v-btn color="blue darken-1" text v-on:click="QNN">QNN()</v-btn>
                     </v-toolbar>
                     
                     <v-data-table :headers="headers" 

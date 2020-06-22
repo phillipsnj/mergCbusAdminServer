@@ -20,7 +20,7 @@ const store = new Vuex.Store({
         dccErrors:[],
         raw:{},
         layout: {},
-        display_component: "nodes_list",
+        display_component: "nodes-list",
         selected_node_id: 0,
         debug : false,
         colours :["black","red","pink","purple","deep-purple","indigo","blue","light-blue","cyan","teal","green","light-green","lime","yellow","amber","orange","deep-orange","brown","blue-grey","grey"]
@@ -64,7 +64,7 @@ var app = new Vue({
     vuetify: new Vuetify(vuetifyOptions),
     data: {
         title: " ",
-        display_component:"nodes_list",
+        display_component:"nodes-list",
         drawer:true,
         events: [],
         nodes: [],

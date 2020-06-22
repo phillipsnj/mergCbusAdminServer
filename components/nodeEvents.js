@@ -95,7 +95,9 @@ Vue.component('nodeEvents', {
                         </v-toolbar>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-icon
+                        <v-btn color="blue darken-1" text @click="editEvent(item)" outlined>Edit</v-btn>
+                        <v-btn color="blue darken-1" text @click="deleteEvent(item)" outlined>Delete</v-btn>
+                        <!--<v-icon
                                 small
                                 class="mr-2"
                                 @click="editEvent(item)"
@@ -107,7 +109,7 @@ Vue.component('nodeEvents', {
                                 @click="deleteEvent(item)"
                         >
                             mdi-delete
-                        </v-icon>
+                        </v-icon>-->
                     </template>
                 </v-data-table>
             </v-card>

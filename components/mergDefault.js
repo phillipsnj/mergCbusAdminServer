@@ -17,12 +17,12 @@ Vue.component('mergDefault', {
     mounted() {
         this.nodeId = this.$store.state.selected_node_id
     },
-    computed : {
+    computed: {
         node: function () {
             return this.$store.state.nodes[this.$store.state.selected_node_id]
         }
     },
-    methods : {
+    methods: {
         getEvents() {
             console.log(`mergDefault - NERD : ${this.nodeId}`)
             this.$root.send('NERD', {'nodeId': this.nodeId})
@@ -30,10 +30,11 @@ Vue.component('mergDefault', {
     },
     template: `
         <v-container>
+            <h1>mergDefault</h1>
             <v-tabs>
                 <v-tab :key="1">Info</v-tab>
                 <v-tab :key="2">Variables</v-tab>
-                <v-tab :key="3"  @click="getEvents()">Events</v-tab>
+                <v-tab :key="3" @click="getEvents()">Events</v-tab>
                 <v-tab-item :key="1">
                     <nodeInfo :nodeId="node.node"></nodeInfo>
                 </v-tab-item>
@@ -66,11 +67,11 @@ Vue.component('merg-default-node-variables', {
         <v-container>
             <h3>Node Variables</h3>
             <v-row>
-                <node-variable v-bind:nodeId="node.node" 
-                              v-bind:varId="n" 
-                              v-for="n in node.parameters[6]"
-                              :key="n">
-                    
+                <node-variable v-bind:nodeId="node.node"
+                               v-bind:varId="n"
+                               v-for="n in node.parameters[6]"
+                               :key="n">
+
                 </node-variable>
             </v-row>
             <p>{{ node.variables }}</p>
@@ -123,7 +124,6 @@ Vue.component('merg-default-node-events', {
     template: `
         <v-container>
             <h3>Event Variables</h3>
-            <p>{{ $store.state.nodes[this.nodeId].actions }}</p>
             <v-card>
                 <v-data-table :headers="headers"
                               :items="eventList"
@@ -144,12 +144,11 @@ Vue.component('merg-default-node-events', {
                                     <v-card-title>
                                         <span class="headline">Edit Event</span>
                                     </v-card-title>
-
                                     <v-card-text>
                                         <v-container>
                                             <v-row>
-                                                <merg-default-node-event-variables 
-                                                        v-bind:nodeId="nodeId" 
+                                                <merg-default-node-event-variables
+                                                        v-bind:nodeId="nodeId"
                                                         v-bind:actionId="editedEvent.actionId">
                                                 </merg-default-node-event-variables>
                                             </v-row>
@@ -160,19 +159,8 @@ Vue.component('merg-default-node-events', {
                         </v-toolbar>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-icon
-                                small
-                                class="mr-2"
-                                @click="editEvent(item)"
-                        >
-                            mdi-pencil
-                        </v-icon>
-                        <v-icon
-                                small
-                                @click="deleteEvent(item)"
-                        >
-                            mdi-delete
-                        </v-icon>
+                        <v-btn color="blue darken-1" text @click="editEvent(item)" outlined>Edit</v-btn>
+                        <v-btn color="blue darken-1" text @click="deleteEvent(item)" outlined>Delete</v-btn>
                     </template>
                 </v-data-table>
             </v-card>
@@ -182,7 +170,7 @@ Vue.component('merg-default-node-events', {
 
 Vue.component('merg-default-node-event-variables', {
     name: "merg-default-node-event-variables",
-    props: ['nodeId','actionId'],
+    props: ['nodeId', 'actionId'],
     mounted() {
         console.log(`merg-default-node-event-variables mounted : ${this.nodeId} :: ${this.actionId}`)
         for (let i = 1; i <= this.node.parameters[5]; i++) {
@@ -204,14 +192,15 @@ Vue.component('merg-default-node-event-variables', {
     }*/,
     template: `
         <v-container>
-            <h3>Node Variables</h3>
+            <h3>Event Variables</h3>
+            <p>{{ node.actions[actionId] }}</p>
             <v-row>
-                <node-event-variable v-bind:nodeId="nodeId" 
-                                   v-bind:actionId="actionId"
-                              v-bind:varId="n" 
-                              v-for="n in node.parameters[5]"
-                              :key="n">
-                    
+                <node-event-variable v-bind:nodeId="nodeId"
+                                     v-bind:actionId="actionId"
+                                     v-bind:varId="n"
+                                     v-for="n in node.parameters[5]"
+                                     :key="n">
+
                 </node-event-variable>
             </v-row>
             <p>{{ node.actions[actionId] }}</p>

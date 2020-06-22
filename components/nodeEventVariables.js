@@ -11,15 +11,7 @@ Vue.component('nodeEventVariables', {
         node: function () {
             return this.$store.state.nodes[this.nodeId]
         }
-    }/*,
-    methods: {
-        getEventVariables: function (actionId) {
-            console.log(`getEventVariables(${actionId})`)
-            for (let i = 1; i <= this.node.parameters[5]; i++) {
-                this.$root.send('REVAL', {"nodeId": this.nodeId, "actionId": actionId, "valueId": i})
-            }
-        }
-    }*/,
+    },
     template: `
         <v-container>
             <h3>Node Variables</h3>
