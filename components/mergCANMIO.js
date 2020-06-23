@@ -257,7 +257,7 @@ Vue.component('merg-canmio-node-events', {
             editedEvent: {event: "0", variables: [], actionId: 1},
             headers: [
                 {text: 'Event Name', value: 'event'},
-                {text: 'Action ID', value: 'actionId'},
+                {text: 'Happening', value: 'actionId'},
                 {text: 'Actions', value: 'actions', sortable: false}
             ]
         }
