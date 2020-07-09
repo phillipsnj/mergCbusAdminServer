@@ -21,7 +21,11 @@ const store = new Vuex.Store({
         raw:{},
         layout: {},
         display_component: "nodes-list",
+        node_component: "nodeInfo",
         selected_node_id: 0,
+        selected_action_id: "",
+        canmio_happening_actions: {},
+        canmio_event_actions: {},
         debug : false,
         colours :["black","red","pink","purple","deep-purple","indigo","blue","light-blue","cyan","teal","green","light-green","lime","yellow","amber","orange","deep-orange","brown","blue-grey","grey"]
     }

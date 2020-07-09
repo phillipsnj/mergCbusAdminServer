@@ -4,7 +4,7 @@ Vue.component('merg-canmio', {
     data: function () {
         return {
             nodeId: 0,
-            happening_actions: {},
+            //happening_actions: {},
             headers: [
                 {text: 'id', value: 'id'},
                 {text: 'nodeId', value: 'nodeId'},
@@ -17,9 +17,10 @@ Vue.component('merg-canmio', {
     },
     mounted() {
         this.nodeId = this.$store.state.selected_node_id
-        for (let i = 16; i <= 121; i = i + 7){
+        for (let i = 16; i <= 121; i = i + 7) {
             this.$root.send('NVRD', {"nodeId": this.nodeId, "variableId": i})
         }
+        this.getInfo()
 
     },
     computed: {
@@ -28,10 +29,67 @@ Vue.component('merg-canmio', {
         }
     },
     methods: {
+        getInfo() {
+            this.$store.state.node_component = "nodeInfo"
+        },
+        getVariables() {
+            this.$store.state.node_component = "merg-canmio-node-variables"
+        },
+        getIOChannels() {
+            this.$store.state.node_component = "merg-canmio-node-channels"
+        },
         getEvents() {
             console.log(`merg-canmio - getEvents : ${this.nodeId}`)
+            this.$root.send('CLEAR_NODE_EVENTS', {'nodeId': this.nodeId})
             this.$root.send('NERD', {'nodeId': this.nodeId})
+            this.update_event_actions()
             this.update_happening_actions()
+            this.$store.state.node_component = "merg-canmio-node-events"
+        },
+        update_event_actions: function () {
+            console.log(`CANMIO : Update_event_actions`)
+            this.event_actions = []
+            let x = 1
+            let y = 8
+            this.event_actions.push({"value": 0, "text": "Do Nothing"})
+            this.event_actions.push({"value": 1, "text": "Start of Day"})
+            this.event_actions.push({"value": 2, "text": "Wait 0.5"})
+            this.event_actions.push({"value": 3, "text": "Wait 1"})
+            this.event_actions.push({"value": 4, "text": "Wait 2"})
+            this.event_actions.push({"value": 5, "text": "Wait 5"})
+            for (let i = 16; i <= 121; i = i + 7) { //Get Channel Types
+
+                if (this.node.variables[i] == 1) {
+                    //output = {"id":y, "name":"Ch-" + x +" Changed"}
+                    this.event_actions.push({"value": y, "text": `Ch-${x} Changed`})
+                    this.event_actions.push({"value": y + 1, "text": `Ch-${x} ON`})
+                    this.event_actions.push({"value": y + 2, "text": `Ch-${x} OFF`})
+                    this.event_actions.push({"value": y + 3, "text": `Ch-${x} Flash`})
+                    this.event_actions.push({"value": y + 4, "text": `Ch-${x} !Changed`})
+                } else if (this.node.variables[i] == 2) {
+                    this.event_actions.push({"value": y, "text": `Ch-${x} Changed`})
+                    this.event_actions.push({"value": y + 1, "text": `Ch-${x} ON`})
+                    this.event_actions.push({"value": y + 2, "text": `Ch-${x} OFF`})
+                } else if (this.node.variables[i] == 3) {
+                    this.event_actions.push({"value": y, "text": `Ch-${x} Changed`})
+                    this.event_actions.push({"value": y + 1, "text": `Ch-${x} ON`})
+                    this.event_actions.push({"value": y + 2, "text": `Ch-${x} OFF`})
+                } else if (this.node.variables[i] == 4) {
+                    this.event_actions.push({"value": y, "text": `Ch-${x} AT1`})
+                    if (this.node.variables[i + 2] > 1) {
+                        this.event_actions.push({"value": y + 1, "text": `Ch-${x} AT2`})
+                    }
+                    if (this.node.variables[i + 2] > 2) {
+                        this.event_actions.push({"value": y + 2, "text": `Ch-${x} AT3`})
+                    }
+                    if (this.node.variables[i + 2] > 3) {
+                        this.event_actions.push({"value": y + 3, "text": `Ch-${x} AT4`})
+                    }
+                }
+                x = x + 1
+                y = y + 5
+            }
+            this.$store.state.canmio_event_actions = this.event_actions
         },
         update_happening_actions: function () {
             console.log(`CANMIO : Update_happening_actions : ${this.nodeId} :: ${this.eventId}`)
@@ -48,58 +106,54 @@ Vue.component('merg-canmio', {
                     this.happening_actions[y] = `Ch-${x} Changed`
                 } else if (this.node.variables[i] == 0) {
                     this.happening_actions[y] = `Ch-${x} Changed`
-                    id = y + 1
                     this.happening_actions[y + 1] = `Ch-${x} TWO_ON`
                 } else if (this.node.variables[i] == 2) {
                     this.happening_actions[y] = `Ch-${x} Reached Off`
-                    id = y + 1
                     this.happening_actions[y + 1] = `Ch-${x} Reached Mid`
-                    id = y + 2
                     this.happening_actions[y + 2] = `Ch-${x} Reached On`
                 } else if (this.node.variables[i] == 3) {
                     this.happening_actions[y] = `Ch-${x} Changed`
                 } else if (this.node.variables[i] == 4) {
                     this.happening_actions[y] = `Ch-${x} AT1`
                     if (this.node.variables[i + 2] > 1) {
-                        id = y + 1
                         this.happening_actions[y + 1] = `Ch-${x} AT2`
                     }
                     if (this.node.variables[i + 2] > 2) {
-                        id = y + 2
                         this.happening_actions[y + 2] = `Ch-${x} AT3`
                     }
                     if (this.node.variables[i + 2] > 3) {
-                        id = y + 3
                         this.happening_actions[y + 3] = `Ch-${x} AT4`
                     }
                 }
                 x = x + 1
                 y = y + 4
             }
+            this.$store.state.canmio_happening_actions = this.happening_actions
         }
     },
     template: `
         <v-container>
             <h1>mergCANMIO</h1>
             <v-tabs>
-                <v-tab :key="1">Info</v-tab>
-                <v-tab :key="2">Variables</v-tab>
-                <v-tab :key="5">IO Channels</v-tab>
+                <v-tab :key="1" @click="getInfo()">Info</v-tab>
+                <v-tab :key="2" @click="getVariables()">Variables</v-tab>
+                <v-tab :key="5" @click="getIOChannels()">IO Channels</v-tab>
                 <v-tab :key="3" @click="getEvents()">Events</v-tab>
                 <v-tab-item :key="1">
-                    <nodeInfo :nodeId="node.node"></nodeInfo>
+                    <!--<nodeInfo :nodeId="node.node"></nodeInfo>-->
                 </v-tab-item>
                 <v-tab-item :key="2">
-                    <merg-canmio-node-variables :nodeId="node.node"></merg-canmio-node-variables>
+                    <!--<merg-canmio-node-variables :nodeId="node.node"></merg-canmio-node-variables>-->
                 </v-tab-item>
                 <v-tab-item :key="5">
-                    <merg-canmio-node-channels :nodeId="node.node"></merg-canmio-node-channels>
+                    <!--<merg-canmio-node-channels :nodeId="node.node"></merg-canmio-node-channels>-->
                 </v-tab-item>
                 <v-tab-item :key="3">
-                    <merg-canmio-node-events :nodeId="node.node" :happening_actions="happening_actions"></merg-canmio-node-events>
+                    <!--<merg-canmio-node-events :nodeId="node.node" :happening_actions="happening_actions"></merg-canmio-node-events>-->
                 </v-tab-item>
             </v-tabs>
-            <p>{{ happening_actions }}</p>
+            <p>{{ $store.state.node_component }}</p>
+            <component v-bind:is="$store.state.node_component"></component>
             <p>{{ JSON.stringify(node) }}</p>
         </v-container>
     `
@@ -107,13 +161,16 @@ Vue.component('merg-canmio', {
 
 Vue.component('merg-canmio-node-variables', {
     name: "merg-canmio-node-variables",
-    props: ['nodeId'],
+    //props: ['nodeId'],
     mounted() {
         for (let i = 1; i <= 4; i++) {
             this.$root.send('NVRD', {"nodeId": this.nodeId, "variableId": i})
         }
     },
     computed: {
+        nodeId: function () {
+            return this.$store.state.selected_node_id
+        },
         node: function () {
             return this.$store.state.nodes[this.nodeId]
         },
@@ -133,14 +190,14 @@ Vue.component('merg-canmio-node-variables', {
 
 Vue.component('merg-canmio-node-channels', {
     name: "merg-canmio-node-channels",
-    props: ['nodeId'],
+    //props: ['nodeId'],
     data: function () {
         return {
             selectedChannel: 1,
             selectedChannelBaseNv: 16,
             IO_channels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
             event_actions: [],
-            happening_actions: [],
+            //happening_actions: [],
             NV_types1: [
                 {"id": 0, "name": "Input"},
                 {"id": 1, "name": "Output"},
@@ -172,6 +229,12 @@ Vue.component('merg-canmio-node-channels', {
         }
     },
     computed: {
+        happening_actions: function () {
+            return this.$store.state.canmio_happening_actions
+        },
+        nodeId: function () {
+            return this.$store.state.selected_node_id
+        },
         node: function () {
             return this.$store.state.nodes[this.nodeId]
         },
@@ -250,7 +313,7 @@ Vue.component('merg-canmio-node-channels', {
 
 Vue.component('merg-canmio-node-events', {
     name: "merg-canmio-node-events",
-    props: ['nodeId', 'happening_actions'],
+    //props: ['nodeId', 'happening_actions'],
     data: function () {
         return {
             eventDialog: false,
@@ -268,8 +331,10 @@ Vue.component('merg-canmio-node-events', {
             for (let i = 1; i <= this.$store.state.nodes[this.nodeId].actions[item.actionId].variables[0] + 1; i++) {
                 this.$root.send('REVAL', {"nodeId": this.nodeId, "actionId": item.actionId, "valueId": i})
             }
-            this.eventDialog = true
+            //this.eventDialog = true
             this.editedEvent = item
+            this.$store.state.selected_action_id = item.actionId
+            this.$store.state.node_component = "merg-canmio-node-event-variables"
 
         },
         deleteEvent: function (event) {
@@ -288,11 +353,17 @@ Vue.component('merg-canmio-node-events', {
         }
     },
     computed: {
+        nodeId: function () {
+            return this.$store.state.selected_node_id
+        },
         node: function () {
             return this.$store.state.nodes[this.nodeId]
         },
         eventList: function () {
             return Object.values(this.$store.state.nodes[this.nodeId].actions)
+        },
+        happening_actions: function () {
+            return this.$store.state.canmio_happening_actions
         }
     },
     template: `
@@ -349,140 +420,62 @@ Vue.component('merg-canmio-node-events', {
 
 Vue.component('merg-canmio-node-event-variables', {
     name: "merg-canmio-node-event-variables",
-    props: ['nodeId', 'actionId'],
+    //props: ['nodeId', 'actionId'],
     data: function () {
         return {
-            event_actions: [],
-            happening_actions: []
+            //event_actions: [],
+            //happening_actions: []
         }
     },
     mounted() {
         console.log(`merg-canmio-node-event-variables mounted : ${this.nodeId} :: ${this.actionId}`)
-        /*for (let i = 1; i <= this.$store.state.nodes[this.nodeId].actions[this.actionId].variables[0] + 1; i++) {
-            this.$root.send('REVAL', {"nodeId": this.nodeId, "actionId": this.actionId, "valueId": i})
-        }*/
-        this.update_event_actions()
-        this.update_happening_actions()
-
     },
     computed: {
+        nodeId: function () {
+            return this.$store.state.selected_node_id
+        },
+        actionId: function () {
+            return this.$store.state.selected_action_id
+        },
         node: function () {
             return this.$store.state.nodes[this.nodeId]
-        }
-    },
-    methods: {
-        update_event_actions: function () {
-            console.log(`CANMIO : Update_event_actions`)
-            this.event_actions = []
-            let x = 1
-            let y = 8
-            this.event_actions.push({"id": 0, "name": "Do Nothing"})
-            this.event_actions.push({"id": 1, "name": "Start of Day"})
-            this.event_actions.push({"id": 2, "name": "Wait 0.5"})
-            this.event_actions.push({"id": 3, "name": "Wait 1"})
-            this.event_actions.push({"id": 4, "name": "Wait 2"})
-            this.event_actions.push({"id": 5, "name": "Wait 5"})
-            for (let i = 16; i <= 121; i = i + 7) { //Get Channel Types
-
-                if (this.node.variables[i] == 1) {
-                    //output = {"id":y, "name":"Ch-" + x +" Changed"}
-                    this.event_actions.push({"id": y, "name": `Ch-${x} Changed`})
-                    this.event_actions.push({"id": y + 1, "name": `Ch-${x} ON`})
-                    this.event_actions.push({"id": y + 2, "name": `Ch-${x} OFF`})
-                    this.event_actions.push({"id": y + 3, "name": `Ch-${x} Flash`})
-                    this.event_actions.push({"id": y + 4, "name": `Ch-${x} !Changed`})
-                } else if (this.node.variables[i] == 2) {
-                    this.event_actions.push({"id": y, "name": `Ch-${x} Changed`})
-                    this.event_actions.push({"id": y + 1, "name": `Ch-${x} ON`})
-                    this.event_actions.push({"id": y + 2, "name": `Ch-${x} OFF`})
-                } else if (this.node.variables[i] == 3) {
-                    this.event_actions.push({"id": y, "name": `Ch-${x} Changed`})
-                    this.event_actions.push({"id": y + 1, "name": `Ch-${x} ON`})
-                    this.event_actions.push({"id": y + 2, "name": `Ch-${x} OFF`})
-                } else if (this.node.variables[i] == 4) {
-                    this.event_actions.push({"id": y, "name": `Ch-${x} AT1`})
-                    if (this.node.variables[i + 2] > 1) {
-                        this.event_actions.push({"id": y + 1, "name": `Ch-${x} AT2`})
-                    }
-                    if (this.node.variables[i + 2] > 2) {
-                        this.event_actions.push({"id": y + 2, "name": `Ch-${x} AT3`})
-                    }
-                    if (this.node.variables[i + 2] > 3) {
-                        this.event_actions.push({"id": y + 3, "name": `Ch-${x} AT4`})
-                    }
-                }
-                x = x + 1
-                y = y + 5
-            }
         },
-        update_happening_actions: function () {
-            console.log(`CANMIO : Update_happening_actions`)
-            this.happening_actions = []
-            let x = 1
-            let y = 8
-            this.happening_actions.push({"id": 0, "name": "No Happening"})
-            this.happening_actions.push({"id": 1, "name": "Produced Startup Event"})
-            for (let i = 16; i <= 121; i = i + 7) { //Get Channel Types
-
-                if (this.node.variables[i] == 1) {
-                    //output = {"id":y, "name":"Ch-" + x +" Changed"}
-                    this.happening_actions.push({"id": y, "name": `Ch-${x} Changed`})
-                } else if (this.node.variables[i] == 0) {
-                    this.happening_actions.push({"id": y, "name": `Ch-${x} Changed`})
-                    this.happening_actions.push({"id": y + 1, "name": `Ch-${x} TWO_ON`})
-                } else if (this.node.variables[i] == 2) {
-                    this.happening_actions.push({"id": y, "name": `Ch-${x} Reached Off`})
-                    this.happening_actions.push({"id": y + 1, "name": `Ch-${x} Reached Mid`})
-                    this.happening_actions.push({"id": y + 2, "name": `Ch-${x} Reached On`})
-                } else if (this.node.variables[i] == 3) {
-                    this.happening_actions.push({"id": y, "name": `Ch-${x} Changed`})
-                } else if (this.node.variables[i] == 4) {
-                    this.happening_actions.push({"id": y, "name": `Ch-${x} AT1`})
-                    if (this.node.variables[i + 2] > 1) {
-                        this.happening_actions.push({"id": y + 1, "name": `Ch-${x} AT2`})
-                    }
-                    if (this.node.variables[i + 2] > 2) {
-                        this.happening_actions.push({"id": y + 2, "name": `Ch-${x} AT3`})
-                    }
-                    if (this.node.variables[i + 2] > 3) {
-                        this.happening_actions.push({"id": y + 3, "name": `Ch-${x} AT4`})
-                    }
-                }
-                x = x + 1
-                y = y + 4
+        event_actions: function () {
+            return this.$store.state.canmio_event_actions
+        },
+        happening_actions: function () {
+            return this.$store.state.canmio_happening_actions
+        },
+        numberEventVariables: function () {
+            if (this.node.actions[this.actionId].variables[0] < 19) {
+                return this.node.actions[this.actionId].variables[0] + 2
+            } else {
+                return 20
             }
         }
     },
+    methods: {},
     template: `
         <v-container>
-            <h3>Event Variables</h3>
-            <p>{{ node.actions[actionId].variables.length }}</p>
-            <p>{{ node.actions[actionId] }}</p>
             <v-row>
-                <v-select
-                        :label="\`Happening\`"
-                        v-model="node.actions[actionId].variables[1]"
-                        :items="happening_actions"
-                        item-text="name"
-                        item-value="id"
-                        outlined
-                        readonly
-                        @change="updateEV(node.node, node.actions[actionId].event, node.actions[actionId].actionId,
-                                                      n, parseInt(node.actions[actionId].variables[1]))"
-                ></v-select>
-            </v-row>
-            <v-row>
-                <node-event-variable v-bind:nodeId="nodeId"
-                                     v-bind:actionId="actionId"
-                                     v-bind:varId="n"
-                                     v-for="n in this.$store.state.nodes[this.nodeId].actions[this.actionId].variables[0]+1"
-                                     :key="n">
+                <h3>Event Variables</h3>
+                <p>{{ node.actions[actionId].variables.length }}</p>
+                <p>{{ node.actions[actionId] }}</p>
+                <h3>Happening :: {{ happening_actions[node.actions[actionId].variables[1]]}}</h3>
+                <node-event-variable-select v-bind:nodeId="nodeId"
+                                            v-bind:actionId="actionId"
+                                            v-bind:varId="n"
+                                            :items="$store.state.canmio_event_actions"
+                                            v-for="n in numberEventVariables"
+                                            :key="n"
+                                            dense
+                                            v-if="n>1">
+                </node-event-variable-select>
 
-                </node-event-variable>
+                <p>{{ node.actions[actionId] }}</p>
+                <p>{{ happening_actions }}</p>
+                <p>{{ event_actions }}</p>
             </v-row>
-            <p>{{ node.actions[actionId] }}</p>
-            <p>{{ happening_actions }}</p>
-            <p>{{ event_actions }}</p>
         </v-container>`
 })
 
@@ -766,7 +759,7 @@ Vue.component('merg-canmio-display-happening', {
     },
     template: `
         <div> {{ happening }} :: {{ happening_actions[happening] }}</div>
-<!--        <div> {{ happening_actions[0] }}</div>-->
-<!--        <div> No Happening </div>-->
+        <!--        <div> {{ happening_actions[0] }}</div>-->
+        <!--        <div> No Happening </div>-->
     `
 })

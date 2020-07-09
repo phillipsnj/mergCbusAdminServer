@@ -1,14 +1,17 @@
 Vue.component('nodeInfo', {
     name: "nodeInfo",
-    props: ['nodeId'],
+    //props: ['nodeId'],
     mounted() {
         for (let i = 1; i <= this.node.parameters[0]; i++) {
             this.$root.send('RQNPN', {"nodeId": this.node.node, "parameter": i})
         }
     },
     computed: {
+        nodeId: function () {
+            return this.$store.state.selected_node_id
+        },
         node: function () {
-            return this.$store.state.nodes[this.nodeId]
+            return this.$store.state.nodes[this.$store.state.selected_node_id]
         },
         moduleVersion: function () {
             return `${this.node.parameters[7]}.${String.fromCharCode(this.node.parameters[2])}`

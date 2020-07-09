@@ -80,6 +80,10 @@ io.on('connection', function(socket){
         node.cbusSend(node.NERD(data.nodeId))
         node.cbusSend(node.RQEVN(data.nodeId))
     })
+    socket.on('CLEAR_NODE_EVENTS', function(data){
+        console.log(`CLEAR_NODE_EVENTS ${data.nodeId}`)
+        node.removeNodeEvents(data.nodeId);
+    })
     socket.on('REFRESH_EVENTS', function(){
         console.log(`REFRESH_EVENTS`)
         node.refreshEvents();

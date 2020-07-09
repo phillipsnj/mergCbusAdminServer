@@ -249,8 +249,17 @@ class cbusAdmin extends EventEmitter {
             },
             '74': (msg) => {
                 console.log(`NUMNEV (74) : ${msg.nodeId()} :: ${msg.paramId()}`);
-                this.config.nodes[msg.nodeId()].EvCount = msg.variableId()
-                this.saveConfig()
+                if (this.config.nodes[msg.nodeId()].EvCount != null) {
+                    if (this.config.nodes[msg.nodeId()].EvCount != msg.variableId() ){
+                        this.config.nodes[msg.nodeId()].EvCount = msg.variableId()
+                        this.saveConfig()
+                    } else {
+                        console.log(`EvCount value has not changed`)
+                    }
+                } else {
+                    this.config.nodes[msg.nodeId()].EvCount = msg.variableId()
+                    this.saveConfig()
+                }
             },
             'DEFAULT': (msg) => {
                 console.log("Opcode " + msg.opCode() + ' NodeId ' + msg.nodeId()+' is not supported by the Admin module');
