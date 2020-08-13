@@ -21,7 +21,7 @@ Vue.component('events', {
                             <!--<v-btn color="success" v-on:click="QNN">QNN()</v-btn>-->
                         </v-toolbar-items>
                     </v-toolbar>
-                    <v-data-table :headers="headers" :items="this.$root.events" item-key="id" class="elevation-1" >
+                    <v-data-table :headers="headers" :items="this.$store.state.events" item-key="id" class="elevation-1" >
                         <template v-slot:items="props">
                             <td>{{ props.item.id }}</td>
                             <td>{{ props.item.nodeId }}</td>
@@ -39,7 +39,7 @@ Vue.component('events', {
                         </template>
                     </v-data-table>
                         <h3>Events</h3>
-                        <div v-for="event in this.$root.events" :key="event.id">
+                        <div v-for="event in this.$store.state.events" :key="event.id">
                             <p>{{ JSON.stringify(event) }}</p>
                         </div>
                    </div>

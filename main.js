@@ -19,7 +19,7 @@ const store = new Vuex.Store({
         cbusErrors:[],
         dccErrors:[],
         raw:{},
-        layout: {},
+        layout:{},
         display_component: "nodes-list",
         node_component: "nodeInfo",
         selected_node_id: 0,
@@ -34,7 +34,7 @@ const store = new Vuex.Store({
 var socket = io.connect();
 
 socket.on('events', function (data) {
-    app.events = data;
+    store.state.events = data;
 });
 
 socket.on('nodes', function (data) {
@@ -44,13 +44,17 @@ socket.on('nodes', function (data) {
 
 socket.on('dccError', function (data) {
     // console.log(`Dcc Errors Received:${JSON.stringify(data)}`)
-    app.dccErrors = data;
+    store.state.dccErrors = data;
 });
 
 socket.on('cbusError', function (data) {
     // console.log(`CBUS Errors Received:${JSON.stringify(data)}`)
-    app.cbusErrors = data;
+    store.state.cbusErrors = data;
 });
+
+socket.on('layoutDetails', (data) => {
+    store.state.layout = data;
+})
 
 Vue.component('test', {
     template: `<h2>Test Component</h2>`
