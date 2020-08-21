@@ -61,17 +61,17 @@ Vue.component('merg-canmio', {
 
                 if (this.node.variables[i] == 1) {
                     //output = {"id":y, "name":"Ch-" + x +" Changed"}
-                    this.event_actions.push({"value": y, "text": `Ch-${x} Changed`})
+                    this.event_actions.push({"value": y, "text": `Ch-${x} Change`})
                     this.event_actions.push({"value": y + 1, "text": `Ch-${x} ON`})
                     this.event_actions.push({"value": y + 2, "text": `Ch-${x} OFF`})
                     this.event_actions.push({"value": y + 3, "text": `Ch-${x} Flash`})
                     this.event_actions.push({"value": y + 4, "text": `Ch-${x} !Changed`})
                 } else if (this.node.variables[i] == 2) {
-                    this.event_actions.push({"value": y, "text": `Ch-${x} Changed`})
+                    this.event_actions.push({"value": y, "text": `Ch-${x} Change`})
                     this.event_actions.push({"value": y + 1, "text": `Ch-${x} ON`})
                     this.event_actions.push({"value": y + 2, "text": `Ch-${x} OFF`})
                 } else if (this.node.variables[i] == 3) {
-                    this.event_actions.push({"value": y, "text": `Ch-${x} Changed`})
+                    this.event_actions.push({"value": y, "text": `Ch-${x} Change`})
                     this.event_actions.push({"value": y + 1, "text": `Ch-${x} ON`})
                     this.event_actions.push({"value": y + 2, "text": `Ch-${x} OFF`})
                 } else if (this.node.variables[i] == 4) {
