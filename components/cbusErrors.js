@@ -23,7 +23,7 @@ Vue.component('cbus-errors', {
                         <!--<v-btn color="success" v-on:click="QNN">QNN()</v-btn>-->
                     </v-toolbar-items>
                 </v-toolbar>
-                <v-data-table :headers="headers" :items="Object.values(this.$root.cbusErrors)" item-key="id"
+                <v-data-table :headers="headers" :items="Object.values(this.$store.state.cbusErrors)" item-key="id"
                               class="elevation-1">
                     <template v-slot:items="props">
                         <td>{{ props.item.id }}</td>
@@ -35,7 +35,7 @@ Vue.component('cbus-errors', {
                     </template>
                 </v-data-table>
                 <h3>CBUS Errors</h3>
-                <div v-for="cbusErr in this.$root.cbusErrors" :key="cbusErr.id">
+                <div v-for="cbusErr in this.$store.state.cbusErrors" :key="cbusErr.id">
                     <p>{{ JSON.stringify(cbusErr) }}</p>
                 </div>
             </v-container>

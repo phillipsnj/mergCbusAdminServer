@@ -40,6 +40,30 @@ class cbusMessage {
         return parseInt(this.message.substr(9, 4), 16);
     }
 
+    sessionId() {
+        return parseInt(this.message.substr(9, 2), 16);
+    }
+
+    locoId() {
+        return parseInt(this.message.substr(11, 4), 16);
+    }
+
+    locoSpeed() {
+        return parseInt(this.message.substr(15, 2), 16);
+    }
+
+    locoF1() {
+        return parseInt(this.message.substr(17, 2), 16);
+    }
+
+    locoF2() {
+        return parseInt(this.message.substr(19, 2), 16);
+    }
+
+    locoF3() {
+        return parseInt(this.message.substr(21, 2), 16);
+    }
+
     eventId() {
         return parseInt(this.message.substr(13, 4), 16);
     }

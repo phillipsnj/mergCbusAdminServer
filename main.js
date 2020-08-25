@@ -18,6 +18,8 @@ const store = new Vuex.Store({
         events: [],
         cbusErrors:[],
         dccErrors:[],
+        cbusNoSupport:[],
+        dccSessions:[],
         raw:{},
         layout:{},
         display_component: "nodes-list",
@@ -50,6 +52,16 @@ socket.on('dccError', function (data) {
 socket.on('cbusError', function (data) {
     // console.log(`CBUS Errors Received:${JSON.stringify(data)}`)
     store.state.cbusErrors = data;
+});
+
+socket.on('cbusNoSupport', function (data) {
+    // console.log(`CBUS Errors Received:${JSON.stringify(data)}`)
+    store.state.cbusNoSupport = data;
+});
+
+socket.on('dccSessions', function (data) {
+    // console.log(`CBUS Errors Received:${JSON.stringify(data)}`)
+    store.state.dccSessions = data;
 });
 
 socket.on('layoutDetails', (data) => {

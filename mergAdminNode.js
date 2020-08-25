@@ -36,6 +36,8 @@ class cbusAdmin extends EventEmitter {
         this.config.nodes = {}
         this.config.events = {}
         this.cbusErrors = {}
+        this.cbusNoSupport = {}
+        this.dccSessions = {}
         this.saveConfig()
         const outHeader = ((((this.pr1 * 4) + this.pr2) * 128) + this.canId) << 5
         this.header = ':S' + outHeader.toString(16).toUpperCase() + 'N'
@@ -261,8 +263,84 @@ class cbusAdmin extends EventEmitter {
                     this.saveConfig()
                 }
             },
+            '21': (msg) => {
+                console.log(`Session Cleared : ${msg.sessionId()}`)
+                let ref = msg.opCode()
+                let session = msg.sessionId()
+                if (session in this.dccSessions) {
+                    this.dccSessions[session].status = 'In Active'
+                } else {
+                    console.log(`Session ${session} does not exist`)
+                }
+                this.emit('dccSessions',this.dccSessions)
+            },
+            '23': (msg) => {
+                //console.log(`Session Keep Alive : ${msg.sessionId()}`)
+                let ref = msg.opCode()
+                let session = msg.sessionId()
+                if (session in this.dccSessions) {
+                    this.dccSessions[session].count +=1
+                    this.dccSessions[session].status = 'Active'
+                } else {
+                    console.log(`Session ${session} does not exist`)
+                    this.dccSessions[session] = {}
+                    this.dccSessions[session].count = 1
+                    this.dccSessions[session].status = 'Active'
+                    this.cbusSend(this.QLOC(session))
+                }
+                this.emit('dccSessions',this.dccSessions)
+            },
+            'E1': (msg) => {
+                let session = msg.sessionId()
+                let loco = msg.locoId()
+                let speed = msg.locoSpeed()
+                let direction = 'Reverse'
+                let F1 = msg.locoF1()
+                let F2 = msg.locoF2()
+                let F3 = msg.locoF3()
+                console.log(`Engine Report : ${session} : ${speed} : ${direction} ${F1},${F2},${F3}`)
+                if (speed > 127) {
+                    direction = 'Forward'
+                    speed = speed - 128
+                }
+                if (!(session in this.dccSessions)) {
+                    this.dccSessions[session] = {}
+                    this.dccSessions[session].count = 0
+                }
+                this.dccSessions[session].id = session
+                this.dccSessions[session].loco = loco
+                this.dccSessions[session].direction = direction
+                this.dccSessions[session].speed = speed
+                this.dccSessions[session].status = 'Active'
+                this.dccSessions[session].F1 = F1
+                this.dccSessions[session].F2 = F2
+                this.dccSessions[session].F3 = F3
+                this.emit('dccSessions',this.dccSessions)
+            },
+            '47': (msg) => {
+                console.log(`DCC Speed Change : ${msg.sessionId()}`)
+                let session = msg.sessionId()
+                this.cbusSend(this.QLOC(session))
+            },
+            '60': (msg) => {
+                console.log(`DCC Set Engine Function : ${msg.sessionId()} ${msg.locoId()} ${msg.messageOutput()}`)
+                let session = msg.sessionId()
+                this.cbusSend(this.QLOC(session))
+            },
             'DEFAULT': (msg) => {
                 console.log("Opcode " + msg.opCode() + ' NodeId ' + msg.nodeId()+' is not supported by the Admin module');
+                let ref = msg.opCode()
+                if (ref in this.cbusNoSupport) {
+                    this.cbusNoSupport[ref].msg = msg
+                    this.cbusNoSupport[ref].count +=1
+                } else {
+                    let output = {}
+                    output['opCode'] = msg.opCode()
+                    output['msg'] = msg
+                    output['count'] = 1
+                    this.cbusNoSupport[ref] = output
+                }
+                this.emit('cbusNoSupport',this.cbusNoSupport)
             }
         }
     }
@@ -418,6 +496,10 @@ class cbusAdmin extends EventEmitter {
 
     ASOF(eventId) {
         return this.header + '990000' + decToHex(eventId, 4) + ';';
+    }
+
+    QLOC(sessionId) {
+        return this.header + '22' + decToHex(sessionId, 2) + ';';
     }
 
     /*ENRSP() {
