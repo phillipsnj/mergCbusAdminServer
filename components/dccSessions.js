@@ -12,7 +12,8 @@ Vue.component('dcc-sessions', {
                 {text: 'count', value: 'count'},
                 {text: 'F1', value: 'F1'},
                 {text: 'F2', value: 'F2'},
-                {text: 'F3', value: 'F3'}
+                {text: 'F3', value: 'F3'},
+                {text: 'functions', value: 'functions'}
             ]
         }
     },
@@ -38,6 +39,7 @@ Vue.component('dcc-sessions', {
             <td>{{ props.item.F1 }}</td>
             <td>{{ props.item.F2 }}</td>
             <td>{{ props.item.F3 }}</td>
+            <td>{{ props.item.functions }}</td>
           </template>
         </v-data-table>
         <h3>CBUS Errors</h3>

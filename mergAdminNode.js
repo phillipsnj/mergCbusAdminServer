@@ -13,7 +13,7 @@ function pad(num, len) { //add zero's to ensure hex values have correct number o
     return padded.substr(-len);
 }
 
-function decToHex(num, len){
+function decToHex(num, len) {
     let output = Number(num).toString(16).toUpperCase()
     var padded = "00000000" + output
     //return (num + Math.pow(16, len)).toString(16).slice(-len).toUpperCase()
@@ -25,7 +25,7 @@ class cbusAdmin extends EventEmitter {
         let setup = jsonfile.readFileSync(CONFIG_FILE)
         const merg = jsonfile.readFileSync('./mergConfig.json')
         super();
-        this.merg=merg
+        this.merg = merg
         console.log(`merg :${JSON.stringify(this.merg)}`)
         //console.log(`merg- 32 :${JSON.stringify(this.merg['modules'][32]['name'])}`)
         this.config = setup
@@ -56,7 +56,7 @@ class cbusAdmin extends EventEmitter {
         this.client.on('error', (err) => {
             console.log(`TCP ERROR ${err.code}`)
         })
-        this.client.on('close', function() {
+        this.client.on('close', function () {
             console.log('Connection Closed')
             setTimeout(() => {
                 this.client.connect(NET_PORT, NET_ADDRESS, function () {
@@ -92,7 +92,7 @@ class cbusAdmin extends EventEmitter {
                         "parameters": [],
                         "variables": [],
                         "actions": {},
-                        "status" : true
+                        "status": true
 
                     }
                     if (this.merg['modules'][msg.moduleId()]) {
@@ -114,9 +114,9 @@ class cbusAdmin extends EventEmitter {
                 }
                 this.config.nodes[ref].status = true
                 //this.saveConfig()
-                this.cbusSend(this.RQNPN(msg.nodeId(),0))// Get the number of Parameters
+                this.cbusSend(this.RQNPN(msg.nodeId(), 0))// Get the number of Parameters
                 //this.cbusSend(this.RQNPN(msg.nodeId(),5))// Get the number of Event Variables
-                this.cbusSend(this.RQNPN(msg.nodeId(),6))// Get the number of Node Variables
+                this.cbusSend(this.RQNPN(msg.nodeId(), 6))// Get the number of Node Variables
                 this.cbusSend((this.RQEVN(msg.nodeId())))
                 //this.cbusSend(this.NVRD(msg.nodeId(),1))//
                 /*let nodes = []
@@ -130,16 +130,16 @@ class cbusAdmin extends EventEmitter {
                 this.saveConfig()
             },
             '90': (msg) => {//Accessory On Long Event
-                this.eventSend(msg,'on','long')
+                this.eventSend(msg, 'on', 'long')
             },
             '91': (msg) => {//Accessory Off Long Event
-                this.eventSend(msg,'off', 'long')
+                this.eventSend(msg, 'off', 'long')
             },
             '98': (msg) => {//Accessory On Long Event
-                this.eventSend(msg,'on','short')
+                this.eventSend(msg, 'on', 'short')
             },
             '99': (msg) => {//Accessory Off Long Event
-                this.eventSend(msg,'off', 'short')
+                this.eventSend(msg, 'off', 'short')
             },
             'EF': (msg) => {//Request Node Parameter in setup
                 // mode
@@ -151,14 +151,14 @@ class cbusAdmin extends EventEmitter {
                 output['type'] = 'DCC'
                 output['Error'] = msg.errorId()
                 output['Message'] = this.merg.dccErrors[msg.errorId()]
-                output['data'] = msg.getStr(9,4)
-                this.emit('dccError',output)
+                output['data'] = msg.getStr(9, 4)
+                this.emit('dccError', output)
             },
             '6F': (msg) => {//Cbus Error
                 console.log(`CBUS ERROR Node ${msg.nodeId()} Error ${msg.errorId()}`)
-                let ref = msg.nodeId().toString()+'-'+msg.errorId().toString()
+                let ref = msg.nodeId().toString() + '-' + msg.errorId().toString()
                 if (ref in this.cbusErrors) {
-                    this.cbusErrors[ref].count +=1
+                    this.cbusErrors[ref].count += 1
                 } else {
                     let output = {}
                     output['id'] = msg.nodeId().toString() + '-' + msg.errorId().toString()
@@ -170,7 +170,7 @@ class cbusAdmin extends EventEmitter {
                     //this.cbusErrors.push(output)
                     this.cbusErrors[ref] = output
                 }
-                this.emit('cbusError',this.cbusErrors)
+                this.emit('cbusError', this.cbusErrors)
             },
             'F2': (msg) => {//ENSRP Response to NERD/NENRD
                 console.log(`ENSRP (F2) Response to NERD : Node : ${msg.nodeId()} Action : ${msg.actionId()} Action Number : ${msg.actionEventId()}`)
@@ -182,8 +182,8 @@ class cbusAdmin extends EventEmitter {
                         "variables": [this.config.nodes[msg.nodeId()].parameters[5]],
                         "actionId": msg.actionEventId()
                     }
-                    this.cbusSend(this.REVAL(msg.nodeId(),msg.actionEventId(),0))
-                    this.cbusSend(this.REVAL(msg.nodeId(),msg.actionEventId(),1))
+                    this.cbusSend(this.REVAL(msg.nodeId(), msg.actionEventId(), 0))
+                    this.cbusSend(this.REVAL(msg.nodeId(), msg.actionEventId(), 1))
                     this.saveConfig()
                 }
                 //this.saveConfig()
@@ -192,7 +192,7 @@ class cbusAdmin extends EventEmitter {
                 console.log(`REVAL (B5) ${msg.nodeId()} Event : ${msg.actionEventIndex()} Event Variable : ${msg.actionEventVarId()} Event Variable Value : ${msg.actionEventVarVal()}`)
                 if (this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] != null) {
                     //console.log(`Event Variable Exists `)
-                    if (this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] != msg.actionEventVarVal()){
+                    if (this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] != msg.actionEventVarVal()) {
                         console.log(`Event Variable Value has Changed `)
                         this.config.nodes[msg.nodeId()].actions[msg.actionEventIndex()].variables[msg.actionEventVarId()] = msg.actionEventVarVal()
                         this.saveConfig()
@@ -228,7 +228,7 @@ class cbusAdmin extends EventEmitter {
             '9B': (msg) => {//PARAN Parameter readback by Index
                 console.log(`PARAN (9B) ${msg.nodeId()} Parameter ${msg.paramId()} Value ${msg.paramValue()}`)
                 if (this.config.nodes[msg.nodeId()].parameters[msg.paramId()] != null) {
-                    if (this.config.nodes[msg.nodeId()].parameters[msg.paramId()] != msg.paramValue()){
+                    if (this.config.nodes[msg.nodeId()].parameters[msg.paramId()] != msg.paramValue()) {
                         console.log(`Parameter value has changed`)
                         this.config.nodes[msg.nodeId()].parameters[msg.paramId()] = msg.paramValue()
                         this.saveConfig()
@@ -252,7 +252,7 @@ class cbusAdmin extends EventEmitter {
             '74': (msg) => {
                 console.log(`NUMNEV (74) : ${msg.nodeId()} :: ${msg.paramId()}`);
                 if (this.config.nodes[msg.nodeId()].EvCount != null) {
-                    if (this.config.nodes[msg.nodeId()].EvCount != msg.variableId() ){
+                    if (this.config.nodes[msg.nodeId()].EvCount != msg.variableId()) {
                         this.config.nodes[msg.nodeId()].EvCount = msg.variableId()
                         this.saveConfig()
                     } else {
@@ -272,14 +272,14 @@ class cbusAdmin extends EventEmitter {
                 } else {
                     console.log(`Session ${session} does not exist`)
                 }
-                this.emit('dccSessions',this.dccSessions)
+                this.emit('dccSessions', this.dccSessions)
             },
             '23': (msg) => {
                 //console.log(`Session Keep Alive : ${msg.sessionId()}`)
                 let ref = msg.opCode()
                 let session = msg.sessionId()
                 if (session in this.dccSessions) {
-                    this.dccSessions[session].count +=1
+                    this.dccSessions[session].count += 1
                     this.dccSessions[session].status = 'Active'
                 } else {
                     console.log(`Session ${session} does not exist`)
@@ -288,7 +288,7 @@ class cbusAdmin extends EventEmitter {
                     this.dccSessions[session].status = 'Active'
                     this.cbusSend(this.QLOC(session))
                 }
-                this.emit('dccSessions',this.dccSessions)
+                this.emit('dccSessions', this.dccSessions)
             },
             'E1': (msg) => {
                 let session = msg.sessionId()
@@ -298,7 +298,7 @@ class cbusAdmin extends EventEmitter {
                 let F1 = msg.locoF1()
                 let F2 = msg.locoF2()
                 let F3 = msg.locoF3()
-                console.log(`Engine Report : ${session} : ${speed} : ${direction} ${F1},${F2},${F3}`)
+                console.log(`Engine Report : ${session} : ${speed} : ${direction}`)
                 if (speed > 127) {
                     direction = 'Forward'
                     speed = speed - 128
@@ -315,24 +315,72 @@ class cbusAdmin extends EventEmitter {
                 this.dccSessions[session].F1 = F1
                 this.dccSessions[session].F2 = F2
                 this.dccSessions[session].F3 = F3
-                this.emit('dccSessions',this.dccSessions)
+                this.emit('dccSessions', this.dccSessions)
             },
             '47': (msg) => {
-                console.log(`DCC Speed Change : ${msg.sessionId()}`)
                 let session = msg.sessionId()
-                this.cbusSend(this.QLOC(session))
+                let speed = msg.locoId()
+                let direction = 'Reverse'
+                if (speed > 127) {
+                    direction = 'Forward'
+                    speed = speed - 128
+                }
+                if (!(session in this.dccSessions)) {
+                    this.dccSessions[session] = {}
+                    this.dccSessions[session].count = 0
+                }
+                console.log(`(47) DCC Speed Change : ${session} : ${direction} : ${speed}`)
+                this.dccSessions[session].direction = direction
+                this.dccSessions[session].speed = speed
+                this.emit('dccSessions', this.dccSessions)
+                //this.cbusSend(this.QLOC(session))
             },
             '60': (msg) => {
-                console.log(`DCC Set Engine Function : ${msg.sessionId()} ${msg.locoId()} ${msg.messageOutput()}`)
                 let session = msg.sessionId()
-                this.cbusSend(this.QLOC(session))
+                let functionRange = msg.getInt(11, 2)
+                let dccNMRA = msg.getInt(13, 2)
+                let func = `F${functionRange}`
+                this.dccSessions[session][func] = dccNMRA
+                let functionArray = []
+                if (this.dccSessions[session].F1 & 1) functionArray.push(1)
+                if (this.dccSessions[session].F1 & 2) functionArray.push(2)
+                if (this.dccSessions[session].F1 & 4) functionArray.push(3)
+                if (this.dccSessions[session].F1 & 8) functionArray.push(4)
+                if (this.dccSessions[session].F2 & 1) functionArray.push(5)
+                if (this.dccSessions[session].F2 & 2) functionArray.push(6)
+                if (this.dccSessions[session].F2 & 4) functionArray.push(7)
+                if (this.dccSessions[session].F2 & 8) functionArray.push(8)
+                if (this.dccSessions[session].F3 & 1) functionArray.push(9)
+                if (this.dccSessions[session].F3 & 2) functionArray.push(10)
+                if (this.dccSessions[session].F3 & 4) functionArray.push(11)
+                if (this.dccSessions[session].F3 & 8) functionArray.push(12)
+                if (this.dccSessions[session].F4 & 1) functionArray.push(13)
+                if (this.dccSessions[session].F4 & 2) functionArray.push(14)
+                if (this.dccSessions[session].F4 & 4) functionArray.push(15)
+                if (this.dccSessions[session].F4 & 8) functionArray.push(16)
+                if (this.dccSessions[session].F4 & 16) functionArray.push(17)
+                if (this.dccSessions[session].F4 & 32) functionArray.push(18)
+                if (this.dccSessions[session].F4 & 64) functionArray.push(19)
+                if (this.dccSessions[session].F4 & 128) functionArray.push(20)
+                if (this.dccSessions[session].F5 & 1) functionArray.push(21)
+                if (this.dccSessions[session].F5 & 2) functionArray.push(22)
+                if (this.dccSessions[session].F5 & 4) functionArray.push(23)
+                if (this.dccSessions[session].F5 & 8) functionArray.push(24)
+                if (this.dccSessions[session].F5 & 16) functionArray.push(25)
+                if (this.dccSessions[session].F5 & 32) functionArray.push(26)
+                if (this.dccSessions[session].F5 & 64) functionArray.push(27)
+                if (this.dccSessions[session].F5 & 128) functionArray.push(28)
+                this.dccSessions[session].functions = functionArray
+                console.log(`DCC Set Engine Function : ${msg.sessionId()} ${functionRange} ${dccNMRA} : ${functionArray}`)
+                this.emit('dccSessions', this.dccSessions)
+                //this.cbusSend(this.QLOC(session))
             },
             'DEFAULT': (msg) => {
-                console.log("Opcode " + msg.opCode() + ' NodeId ' + msg.nodeId()+' is not supported by the Admin module');
+                console.log("Opcode " + msg.opCode() + ' NodeId ' + msg.nodeId() + ' is not supported by the Admin module');
                 let ref = msg.opCode()
                 if (ref in this.cbusNoSupport) {
                     this.cbusNoSupport[ref].msg = msg
-                    this.cbusNoSupport[ref].count +=1
+                    this.cbusNoSupport[ref].count += 1
                 } else {
                     let output = {}
                     output['opCode'] = msg.opCode()
@@ -340,7 +388,7 @@ class cbusAdmin extends EventEmitter {
                     output['count'] = 1
                     this.cbusNoSupport[ref] = output
                 }
-                this.emit('cbusNoSupport',this.cbusNoSupport)
+                this.emit('cbusNoSupport', this.cbusNoSupport)
             }
         }
     }
@@ -360,7 +408,7 @@ class cbusAdmin extends EventEmitter {
 
     clearCbusErrors() {
         this.cbusErrors = {}
-        this.emit('cbusError',this.cbusErrors)
+        this.emit('cbusError', this.cbusErrors)
     }
 
     cbusSend(msg) {
@@ -375,7 +423,7 @@ class cbusAdmin extends EventEmitter {
 
     eventSend(msg, status, type) {
         let eId = ''
-        if (type == 'long'){
+        if (type == 'long') {
             eId = msg.fullEventId()
         } else {
             eId = msg.shortEventId()
@@ -385,7 +433,7 @@ class cbusAdmin extends EventEmitter {
             this.config.events[eId]['status'] = status
             this.config.events[eId]['count'] += 1
         } else {
-            let output={}
+            let output = {}
             output['id'] = eId
             output['nodeId'] = msg.nodeId()
             output['eventId'] = msg.eventId()
@@ -419,7 +467,7 @@ class cbusAdmin extends EventEmitter {
     }
 
     QNN() {//Query Node Number
-        for (let node in this.config.nodes){
+        for (let node in this.config.nodes) {
             this.config.nodes[node].status = false
         }
         return this.header + '0D' + ';'
@@ -453,10 +501,12 @@ class cbusAdmin extends EventEmitter {
         //console.log(`Reval NodeId : ${nodeId} EventId : ${eventId} Event Value : ${valueId}`)
         return this.header + '9C' + decToHex(nodeId, 4) + decToHex(eventId, 2) + decToHex(valueId, 2) + ';'
     }
+
     EVLRN(event, eventId, valueId) {//Read an Events EV by index
         //console.log(`EVLRN Event : ${event} EventId : ${eventId} Event Value : ${valueId}`)
         return this.header + 'D2' + event + decToHex(eventId, 2) + decToHex(valueId, 2) + ';'
     }
+
     EVULN(event) {//Read an Events EV by index
         console.log(`EVULN Event : ${event}`)
         return this.header + '95' + event + ';'
@@ -467,13 +517,14 @@ class cbusAdmin extends EventEmitter {
     }
 
     RQEVN(nodeId) {// Read Node Variable
-        return this.header + '58' + decToHex(nodeId, 4)+ ';'
+        return this.header + '58' + decToHex(nodeId, 4) + ';'
     }
 
     NVSET(nodeId, variableId, variableVal) {// Read Node Variable
-        console.log(`NVSET NodeId : ${nodeId} VariableId : ${variableId} Variable Value : ${variableVal} :: ${decToHex(variableVal,2)}`)
-        return this.header + '96' + decToHex(nodeId, 4) + decToHex(variableId, 2) + decToHex(variableVal,2) + ';'
+        console.log(`NVSET NodeId : ${nodeId} VariableId : ${variableId} Variable Value : ${variableVal} :: ${decToHex(variableVal, 2)}`)
+        return this.header + '96' + decToHex(nodeId, 4) + decToHex(variableId, 2) + decToHex(variableVal, 2) + ';'
     }
+
     ACON(nodeId, eventId) {
         const eId = decToHex(nodeId, 4) + decToHex(eventId, 4)
         this.config.events[eId]['status'] = 'on'
@@ -490,6 +541,7 @@ class cbusAdmin extends EventEmitter {
         this.emit('events', Object.values(this.config.events))
         return this.header + '91' + decToHex(nodeId, 4) + decToHex(eventId, 4) + ';';
     }
+
     ASON(eventId) {
         return this.header + '980000' + decToHex(eventId, 4) + ';';
     }
@@ -586,7 +638,6 @@ class cbusAdmin extends EventEmitter {
 
     */
 };
-
 
 
 module.exports = {
